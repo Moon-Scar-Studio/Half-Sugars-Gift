@@ -1,7 +1,5 @@
-
-
-
-namespace NebulaN.Roles.crewmate;
+﻿
+namespace NebulaN.Roles.Crewmate;
 
 public class Wish : DefinedRoleTemplate, HasCitation, DefinedRole,
     RuntimeAssignableGenerator<RuntimeRole>,IAssignableDocument
@@ -143,18 +141,19 @@ public class Wish : DefinedRoleTemplate, HasCitation, DefinedRole,
             if (ev.Dead==MarkedPlayer) 
             { 
                 //var 邪恶凶手 = ev.Murderer;// 用中文出问题算谁的。
-                var murderer = ev.Murderer; //那我不用了
+                var murderer = ev.Murderer; // 那我不用了。
                 if (murderer != null)
                 {
+                    string hex = PatchManager.GetPlayerHexColor(MarkedPlayer);
                     string msg = Language.Translate("role.wish.markdead").Replace("%KILLER%", murderer.PlayerName)
-                        .Replace("%VICTIM%", MarkedPlayer.PlayerName).Replace("%COLOR%", ColorHelper.ColorToHexRGB(MarkedPlayer.Role.Role.Color.ToUnityColor()));
+                        .Replace("%VICTIM%", MarkedPlayer.PlayerName).Replace("%COLOR%",ColorHelper.ColorToHexRGB(MarkedPlayer.Role.Role.Color.ToUnityColor()));
                     HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, msg);
                     HsgDebug.Log($"{msg}");
                 }
                 else
                 {
-                    string msg2 = Language.Translate("role.wish.murdererdead").Replace("%VICTIM%", MarkedPlayer.PlayerName).Replace("%COLOR%", ColorHelper.ColorToHexRGB(MarkedPlayer.Role.Role.Color.ToUnityColor()));
-                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, msg2);
+                    string msg2 = Language.Translate("role.wish.murdererdead").Replace("%VICTIMS%", MarkedPlayer.PlayerName).Replace("%COLOR%", ColorHelper.ColorToHexRGB(MarkedPlayer.Role.Role.Color.ToUnityColor()));
+                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, Language.Translate(msg2));
                 }
             }
         }
@@ -175,6 +174,14 @@ public class Wish : DefinedRoleTemplate, HasCitation, DefinedRole,
                 RpcPlayReviveFlash.Invoke(MarkedPlayer.PlayerId);
                 MarkedPlayer = null;
             }
+        }
+        public bool OnExiledPost(byte[] voters, byte exiledPlayerId)
+        {
+            if (exiledPlayerId == MarkedPlayer.PlayerId)
+            {
+                return false;
+            }
+            return true;
         }
         [Local]
         private void DecorateMarkedPlayerName(PlayerDecorateNameEvent ev)

@@ -1,5 +1,5 @@
 ﻿
-namespace NebulaN.Scripts.Roles.crewmate;
+namespace NebulaN.Scripts.Roles.Crewmate;
 
 
 public class MaskedDancer : DefinedRoleTemplate, HasCitation, DefinedRole,

@@ -1,4 +1,4 @@
-using Nebula.Configuration;
+﻿using Nebula.Configuration;
 using NebulaN.Roles.Modifier;
 
 namespace NebulaN.Roles.Neutral
@@ -55,7 +55,6 @@ namespace NebulaN.Roles.Neutral
         {
             bool _winTriggered = false;
             DefinedRole RuntimeRole.Role => MyRole;
-
             public Instance(GamePlayer player) : base(player) { }
 
             void RuntimeAssignable.OnActivated() { }
@@ -84,7 +83,6 @@ namespace NebulaN.Roles.Neutral
                 if (candidateRoles.Count == 0)
                 {
                     MyPlayer.Suicide(State.Depression,null,KillParameter.NormalKill,null);
-                    return;
                 }
                 var tabs = new (string? tab, Predicate<DefinedRole>? predicate)[]
                 {
@@ -133,7 +131,7 @@ namespace NebulaN.Roles.Neutral
                 if (_winTriggered || MyPlayer.IsDead) return;
                 var winners = BitMasks.AsPlayer();
                 winners.Add(MyPlayer);
-                ev.TryOverwriteEnd(HalfSugarGift.Core.Patch.Team.ImaginationWin, 80, GameEndReason.Special, (int)winners.AsRawPattern);
+                ev.TryOverwriteEnd(HalfSugarGift.Core.Patch.Team.ImaginationWin,80,GameEndReason.Special,(int)winners.AsRawPattern);
                 _winTriggered = true;
             }
         }

@@ -50,7 +50,7 @@ public class Amulet : DefinedAllocatableModifierTemplate, DefinedAllocatableModi
                 if (killer == null) return;
 
                 ev.Cancel();
-                Taoist.RpcTaoistSacrifice.Invoke((taoist.PlayerId, killer.PlayerId, MyPlayer.PlayerId));
+                Taoist.RpcTaoistSacrifice.Invoke((taoist.PlayerId, killer.PlayerId));
 
                 if (MyPlayer.AmOwner)
                 {
@@ -60,39 +60,6 @@ public class Amulet : DefinedAllocatableModifierTemplate, DefinedAllocatableModi
                             new Virial.Color(0.8f, 0.7f, 0.2f), 2f, false);
                 }
             }, this);
-
-            GameOperatorManager.Instance.Subscribe<PlayerKillPlayerEvent>(OnHostKillPlayer, this);
-        }
-
-        [OnlyHost]
-        void OnHostKillPlayer(PlayerKillPlayerEvent ev)
-        {
-            if (ev.Dead != MyPlayer) return;
-            if (MyPlayer.IsDead) return;
-
-            GamePlayer? taoist = null;
-            foreach (var p in GamePlayer.AllPlayerlikes)
-            {
-                if (p is GamePlayer gp && gp.Role?.Role == Taoist.MyRole && !gp.IsDead)
-                {
-                    taoist = gp;
-                    break;
-                }
-            }
-            if (taoist == null) return;
-
-            var killer = ev.Murderer;
-            if (killer == null) return;
-
-            Taoist.RpcTaoistSacrifice.Invoke((taoist.PlayerId, killer.PlayerId, MyPlayer.PlayerId));
-
-            if (MyPlayer.AmOwner)
-            {
-                var title = NebulaAPI.CurrentGame?.GetModule<TitleShower>();
-                if (title != null)
-                    title.SetText(Language.Translate("role.taoist.amuletSaved"),
-                        new Virial.Color(0.8f, 0.7f, 0.2f), 2f, false);
-            }
         }
 
         void RuntimeAssignable.OnActivated()

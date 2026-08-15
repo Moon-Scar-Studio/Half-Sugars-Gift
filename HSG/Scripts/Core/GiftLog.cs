@@ -1,4 +1,4 @@
-namespace HalfSugarGift.Core;
+﻿namespace HalfSugarGift.Core;
 
 public static class HsgDebug
 {

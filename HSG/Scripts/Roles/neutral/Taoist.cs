@@ -17,13 +17,16 @@ public class Taoist : DefinedRoleTemplate, DefinedRole, HasCitation,
         RoleCategory.NeutralRole,
         HSGTeam.TaoistTeam,
         [AmuletCooldown]
-    ) { }
+    ) 
+    {
+        ConfigurationHolder!.Illustration = NebulaAPI.AddonAsset.GetResource("BigPic/TaoistPic.png")?.AsImage(115f);
+    }
 
     public static readonly Taoist MyRole = new();
     public Citation Citation => Citations.Hellos497;
     RuntimeRole RuntimeAssignableGenerator<RuntimeRole>.CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
 
-    Virial.Media.Image? DefinedAssignable.IconImage =>
+    Image? DefinedAssignable.IconImage =>
         NebulaAPI.AddonAsset.GetResource("Smallicon/TaoistIcon.png")?.AsImage();
 
     public static readonly TranslatableTag SacrificedState = new TranslatableTag("state.taoistSacrifice");
@@ -45,14 +48,13 @@ public class Taoist : DefinedRoleTemplate, DefinedRole, HasCitation,
         yield break;
     }
 
-    internal static readonly RemoteProcess<(byte taoistId, byte killerId, byte targetId)> RpcTaoistSacrifice = new(
+    internal static readonly RemoteProcess<(byte taoistId, byte killerId)> RpcTaoistSacrifice = new(
         "Taoist.Sacrifice",
         (data, _) =>
         {
             if (!AmongUsClient.Instance.AmHost) return;
             var taoist = GamePlayer.GetPlayer(data.taoistId);
             var killer = GamePlayer.GetPlayer(data.killerId);
-            var target = GamePlayer.GetPlayer(data.targetId);
             if (taoist == null || taoist.IsDead) return;
             if (killer == null || killer.IsDead) return;
 
@@ -64,8 +66,6 @@ public class Taoist : DefinedRoleTemplate, DefinedRole, HasCitation,
                     taoist.Suicide(SacrificedState, EventDetail.Kill, KillParameter.NormalKill);
                 if (!killer.IsDead)
                     killer.Suicide(AmuletTriggeredState, EventDetail.Kill, KillParameter.NormalKill);
-                if (target != null && target.IsDead)
-                    target.Revive(null, target.Position, true, false);
             });
         }
     );
@@ -131,7 +131,7 @@ public class Taoist : DefinedRoleTemplate, DefinedRole, HasCitation,
                 }
             }));
         }
-//AI不好用你们知道吗
+        //AI不好用你们知道吗
         void RuntimeAssignable.OnActivated()
         {
             if (!AmOwner) return;
@@ -181,7 +181,7 @@ public class Taoist : DefinedRoleTemplate, DefinedRole, HasCitation,
             if (_used && _amuletTargetId != byte.MaxValue)
             {
                 var target = GamePlayer.GetPlayer(_amuletTargetId);
-                if (target != null)
+                if (target != null && target.IsAlive)
                 {
                     ev.ExtraWinMask.Add(HSGTeam.ExtraTaoistWin);
                     ev.IsExtraWin = true;

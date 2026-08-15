@@ -1,4 +1,4 @@
-namespace NebulaN.Roles.Crewmate;
+﻿namespace NebulaN.Roles.Crewmate;
 
 public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignableDocument
 {
@@ -12,7 +12,6 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
         new[] { "options.role.snitch.all", "options.role.snitch.one", "options.role.snitch.two", "options.role.snitch.three", "options.role.snitch.four", "options.role.snitch.five" },
         1
         );
-    /* 
     static BoolConfiguration UseSpeTask = NebulaAPI.Configurations.Configuration(
         "options.role.snitch.useSpeTask",
         false
@@ -23,7 +22,6 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
         7,
         () => UseSpeTask
         );
-    */
     static ValueConfiguration<int> NeCo = NebulaAPI.Configurations.Configuration(
         "options.role.snitch.NeCo",
         new[] {
@@ -41,7 +39,7 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
         NebulaTeams.CrewmateTeam,
         new Virial.Configuration.IConfiguration[]
         {
-            CanBeGuess, ZhixiangJiGeLang, /*UseSpeTask, TaskShuLiang,*/ NeCo,
+            CanBeGuess, ZhixiangJiGeLang, UseSpeTask, TaskShuLiang, NeCo,
         }
     )
     {
@@ -163,7 +161,6 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
         {
             if (ev.Player.Role.Role != MyRole) return;
             int targetTotal;
-            /* 特殊任务数量设置
             if (UseSpeTask)
             {
                 targetTotal = TaskShuLiang;
@@ -176,7 +173,6 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
                     ev.AddExtraQuota(targetTotal - ev.Tasks.Count);
             }
             else
-            */
             {
                 targetTotal = ev.Tasks.Count + ev.ExtraQuota;
                 if (targetTotal == 0)

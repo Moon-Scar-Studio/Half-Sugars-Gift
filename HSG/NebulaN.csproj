@@ -1,0 +1,502 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>NebulaN</AssemblyName>
+    <Product>My first plugin</Product>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+    <RootNamespace>NebulaN</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="NebulaAPI" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="AddressablesPlayAssetDelivery">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\AddressablesPlayAssetDelivery.dll</HintPath>
+    </Reference>
+    <Reference Include="AmongUsCaching">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\AmongUsCaching.dll</HintPath>
+    </Reference>
+    <Reference Include="AsmResolver">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AsmResolver.dll</HintPath>
+    </Reference>
+    <Reference Include="AsmResolver.DotNet">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AsmResolver.DotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="AsmResolver.PE">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AsmResolver.PE.dll</HintPath>
+    </Reference>
+    <Reference Include="AsmResolver.PE.File">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AsmResolver.PE.File.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="AssetRipper.CIL">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AssetRipper.CIL.dll</HintPath>
+    </Reference>
+    <Reference Include="AssetRipper.Primitives">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\AssetRipper.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\BepInEx.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Preloader.Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\core\BepInEx.Preloader.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Unity.Common">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\BepInEx.Unity.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+    </Reference>
+    <Reference Include="Cpp2IL.Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Cpp2IL.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Disarm">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Disarm.dll</HintPath>
+    </Reference>
+    <Reference Include="Gee.External.Capstone">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Gee.External.Capstone.dll</HintPath>
+    </Reference>
+    <Reference Include="Hazel">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Hazel.dll</HintPath>
+    </Reference>
+    <Reference Include="Iced">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Iced.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Common">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Il2CppInterop.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Generator">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Il2CppInterop.Generator.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.HarmonySupport">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Il2CppInterop.HarmonySupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Il2CppInterop.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppMono.Security">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppMono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Configuration">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Data">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Drawing">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Net.Http">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Numerics">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Runtime.Serialization">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Xml">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Xml.Linq">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Il2CppSystem.Xml.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="io.sentry.unity.runtime">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\io.sentry.unity.runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="LibCpp2IL">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\LibCpp2IL.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Nebula">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云v3.4.1.1+plan17 3.3\BepInEx\nebula\Nebula.dll</HintPath>
+    </Reference>
+    <Reference Include="NebulaAPI">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云v3.4.1.1+plan17 3.3\NebulaLibs\NebulaAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="NebulaLoader">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云v3.4.1.1+plan17 3.3\BepInEx\plugins\NebulaLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="QRCoder">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\QRCoder.dll</HintPath>
+    </Reference>
+    <Reference Include="Rewired_Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Rewired_Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Rewired_Windows">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Rewired_Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Rewired_Windows_Functions">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Rewired_Windows_Functions.dll</HintPath>
+    </Reference>
+    <Reference Include="SemanticVersioning">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\SemanticVersioning.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Microsoft.Bcl.AsyncInterfaces">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Buffers">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Collections.Immutable">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Memory">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Numerics.Vectors">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Reflection.Metadata">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Reflection.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Runtime.CompilerServices.Unsafe">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Text.Encodings.Web">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Text.Json">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.System.Threading.Tasks.Extensions">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Unity">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Sentry.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="StableNameDotNet">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\StableNameDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Addressables.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Analytics.DataPrivacy">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Analytics.DataPrivacy.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.LevelPlay">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.LevelPlay.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.ProBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.ResourceManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Analytics">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Configuration">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Device">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Device.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Environments.Internal">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Environments.Internal.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Internal">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Internal.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Registration">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Registration.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Scheduler">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Scheduler.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Telemetry">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Telemetry.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Threading">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.Services.Core.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AccessibilityModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AccessibilityModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AndroidJNIModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AndroidJNIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterInputModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ClusterInputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterRendererModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ClusterRendererModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ContentLoadModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ContentLoadModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CrashReportingModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.CrashReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DSPGraphModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.DSPGraphModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GIModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.GIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GridModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.HotReloadModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.LocalizationModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.LocalizationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PerformanceReportingModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.PerformanceReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ProfilerModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ProfilerModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PropertiesModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.PropertiesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Purchasing.SecurityCore">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.Purchasing.SecurityCore.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.ScreenCaptureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.SharedInternalsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteMaskModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.SpriteMaskModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteShapeModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.SpriteShapeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StreamingModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.StreamingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubsystemsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.SubsystemsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreFontEngineModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreTextEngineModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TilemapModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TilemapModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TLSModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.TLSModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UmbraModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UmbraModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityAnalyticsCommonModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityAnalyticsCommonModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityAnalyticsModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityConnectModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityCurlModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityCurlModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityTestProtocolModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityTestProtocolModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VehiclesModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.VehiclesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VFXModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.VFXModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.VideoModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VirtualTexturingModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.VirtualTexturingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VRModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.VRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WindModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.WindModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="WasmDisassembler">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\星云260516b+Plan17v3.1.3\星云260516b+Plan17v3.1.3\BepInEx\core\WasmDisassembler.dll</HintPath>
+    </Reference>
+    <Reference Include="__Generated">
+      <HintPath>..\..\Steam\steamapps\common\Among Us Modded\NoS260423+Plan173.1.2.2(5月10日)\BepInEx\interop\__Generated.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Krafs.Publicizer" Version="1.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<Publicize Include="Nebula" />
+		<Publicize Include="NebulaAPI" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Scripts\Core\API\CustomTask\" />
+	</ItemGroup>
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CS0507</NoWarn>
+	</PropertyGroup>
+</Project>
