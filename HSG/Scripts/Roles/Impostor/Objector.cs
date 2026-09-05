@@ -64,8 +64,8 @@ public class Objector : DefinedRoleTemplate, HasCitation, DefinedRole, RuntimeAs
             if (!AmOwner) return;
             var objector = new ModAbilityButtonImpl(alwaysShow: true).Register(this);
             objector.SetSprite(NebulaAPI.AddonAsset.GetResource("objector.png")?.AsImage().GetSprite());
-            objector.Availability = (button) => MeetingHud.Instance.AsBoolFast(out var meeting) && meeting.CurrentState == MeetingHud.VoteStates.NotVoted;
-            objector.Visibility = (button) => !MyPlayer.IsDead && MeetingHud.Instance.AsBoolFast(out var meeting) && (meeting.CurrentState == MeetingHud.VoteStates.NotVoted || meeting.CurrentState == MeetingHud.VoteStates.Discussion) && !UsedObjector;
+            objector.Availability = (button) => MeetingHud.Instance.AsBoolFast(out var meeting) && meeting.CurrentState == MeetingHud.MeetingStates.NotVoted;
+            objector.Visibility = (button) => !MyPlayer.IsDead && MeetingHud.Instance.AsBoolFast(out var meeting) && (meeting.CurrentState == MeetingHud.MeetingStates.NotVoted || meeting.CurrentState == MeetingHud.MeetingStates.Discussion) && !UsedObjector;
             objector.SetLabel("objector.obj");
             objector.OnClick = (button) =>
             {

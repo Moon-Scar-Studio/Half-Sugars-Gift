@@ -4,11 +4,12 @@ public class Saboteur : DefinedSingleAbilityRoleTemplate<Saboteur.Ability>, HasC
 {
     Saboteur() : base("saboteur", Cor.impRed, RoleCategory.ImpostorRole, NebulaTeams.ImpostorTeam, [KillCoolDown, ReducePerSabotage, ReducePerKillDuringSabotage, MinCoolDown, MaxStack])
     {
-    }
 
+        ConfigurationHolder.Illustration = NebulaAPI.AddonAsset.GetResource("BigPic/SaboImage.png")?.AsImage(115f);
+    }
+    Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/SaboteurIcon.png")?.AsImage();
     static IRelativeCooldownConfiguration KillCoolDown = NebulaAPI.Configurations.KillConfiguration(
-        "options.role.saboteur.killcooldown",
-        CoolDownType.Relative,
+        "options.role.saboteur.killcooldown",CoolDownType.Relative,
         (0f, 60f, 2.5f),
         30f,
         (-40f, 40f, 2.5f),
@@ -71,19 +72,8 @@ public class Saboteur : DefinedSingleAbilityRoleTemplate<Saboteur.Ability>, HasC
             );
             tracker.SetColor(Cor.impRed);
 
-            killButton = NebulaAPI.Modules.AbilityButton(
-                this,
-                MyPlayer,
-                true,
-                false,
-                VirtualKeyInput.Kill,
-                null,
-                KillCoolDown.Cooldown,
-                "kill",
-                null,
-                _ => tracker.CurrentTarget != null,
-                _ => !MyPlayer.IsDead,
-                false
+            killButton = NebulaAPI.Modules.AbilityButton(this,MyPlayer,true,false,
+                VirtualKeyInput.Kill,null,KillCoolDown.Cooldown, "kill",null, _ => tracker.CurrentTarget != null,_ => !MyPlayer.IsDead,false
             ).SetLabelType(ModAbilityButton.LabelType.Impostor);
 
             killButton.OnClick = button =>
@@ -94,14 +84,8 @@ public class Saboteur : DefinedSingleAbilityRoleTemplate<Saboteur.Ability>, HasC
                 var cancelable = GameOperatorManager.Instance?.Run(
                     new PlayerTryVanillaKillLocalEventAbstractPlayerEvent(MyPlayer, target)
                 );
-
                 if (cancelable?.IsCanceled ?? false) return;
-
-                MyPlayer.MurderPlayer(
-                    target,
-                    PlayerState.Dead,
-                    EventDetail.Kill,
-                    KillParameter.NormalKill,
+                MyPlayer.MurderPlayer(target,PlayerState.Dead,EventDetail.Kill,KillParameter.NormalKill,
                     result =>
                     {
                         if (result == KillResult.Kill)
@@ -126,20 +110,12 @@ public class Saboteur : DefinedSingleAbilityRoleTemplate<Saboteur.Ability>, HasC
 
         float CurrentCooldown()
         {
-            return Mathf.Max(
-                MinCoolDown,
-                KillCoolDown.Cooldown - CurrentReduce
-            );
+            return Mathf.Max(MinCoolDown,KillCoolDown.Cooldown - CurrentReduce);
         }
 
         void ResetCooldown(ModAbilityButton button)
         {
-            button.CoolDownTimer = NebulaAPI.Modules.Timer(
-                this,
-                CurrentCooldown()
-            )
-            .SetAsKillCoolTimer()
-            .Start();
+            button.CoolDownTimer = NebulaAPI.Modules.Timer(this,CurrentCooldown()).SetAsKillCoolTimer().Start();
         }
 
         [Local]
@@ -155,10 +131,7 @@ public class Saboteur : DefinedSingleAbilityRoleTemplate<Saboteur.Ability>, HasC
             {
                 if (sabotage)
                 {
-                    DestroyCount = Mathf.Min(
-                        DestroyCount + 1,
-                        MaxStack
-                    );
+                    DestroyCount = Mathf.Min(DestroyCount + 1,MaxStack);
                 }
                 sabotage = false;
                 temporaryReduce = 0f;

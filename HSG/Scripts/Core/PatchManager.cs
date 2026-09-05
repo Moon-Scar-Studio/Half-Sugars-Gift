@@ -191,6 +191,12 @@ public static partial class PatchManager
         new[] { ConfigurationTab.Settings },
         GameModes.AllGameModes
         );
+    public static readonly IConfigurationHolder FunMode = NebulaAPI.Configurations.Holder(
+    NebulaAPI.GUI.LocalizedTextComponent("options.hsg.fm.holder.title"),
+    NebulaAPI.GUI.LocalizedTextComponent("options.hsg.fm.holder.detail"),
+    new[] { ConfigurationTab.Settings },
+    GameModes.AllGameModes
+    );
     public static RemoteProcess<byte> RpcPlayMeetingDeath = new("PlayMeetingDeath", (victimId, _) =>
     {
         var victim = GamePlayer.GetPlayer(victimId);
@@ -201,6 +207,7 @@ public static partial class PatchManager
     {
         LoadMVS();
         LoadRandomEventConfiguration();
+        LoadFunModeConfiguration();
     }
     static void LoadMVS()
     {
@@ -209,15 +216,11 @@ public static partial class PatchManager
         MVS.AppendConfiguration(MoreVoteSettings.VoteDuration);
         HsgDebug.Log("MVS 加载");
     }
-    static void LoadPictures()
-    {
-        Hint WithImage(string id)
-        {
-            return new HintWithImage(NebulaAPI.AddonAsset.GetResource("Hints/" + id.HeadUpper() + ".png")!.AsImage()!, new TranslateTextComponent("hint." + id.HeadLower() + ".title"), new TranslateTextComponent("hint." + id.HeadLower() + ".detail"));
-        }
-        HintManager.AllHints = new();
-        HintManager.RegisterHint(WithImage(""));
-    }
+    //static void LoadPictures()
+    //{
+    //    Hint WithImage(string id) => new HintWithImage(NebulaAPI.AddonAsset.GetResource("Hints/" + id.HeadUpper() + ".png")!.AsImage()!, new TranslateTextComponent("hint." + id.HeadLower() + ".title"), new TranslateTextComponent("hint." + id.HeadLower() + ".detail"));
+    //    HintManager.AllHints = [];
+    //}
     static void LoadRandomEventConfiguration()
     {
         RandomEvents.AppendConfiguration(RandomEventSettings.EnableRandomEventsSettings);
@@ -231,6 +234,11 @@ public static partial class PatchManager
         RandomEvents.AppendConfiguration(RandomEventSettings.PartyWeight);
         RandomEvents.AppendConfiguration(RandomEventSettings.GetKeyWeight);
         HsgDebug.Log("随机事件配置加载");
+    }
+    static void LoadFunModeConfiguration()
+    {
+        FunMode.AppendConfiguration(FunModes.EnableMiniMode);
+        FunMode.AppendConfiguration(FunModes.MiniScale);
     }
     static RemoteProcess<(byte playerId, float x, float y)> RpcRequestMove = new("RpcRequestMove", (msg, _) =>
     {
@@ -350,7 +358,7 @@ public static partial class PatchManager
         var states = hud.playerStates;
         foreach (var state in states) state.gameObject.SetActive(false);
         yield return null;
-        var victimState = states.FirstOrDefault(s => s.TargetPlayerId == victim.PlayerId);
+        var victimState = states.FirstOrDefault(s => s.PlayerId == victim.PlayerId);
         if (victimState != null) victimState.gameObject.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         victim.MurderPlayer(victim, PlayerStates.Dead, null, KillParameter.NormalKill);
@@ -547,7 +555,7 @@ public static partial class PatchManager
         IEnumerator CoCloseOnResult()
         {
             if (MeetingHud.Instance)
-                while (MeetingHud.Instance.state != MeetingHud.VoteStates.Results) yield return null;
+                while (MeetingHud.Instance.state != MeetingHud.MeetingStates.Results) yield return null;
             else
                 while (!MeetingHud.Instance) yield return null;
             window.CloseScreen();
@@ -627,7 +635,7 @@ public static partial class PatchManager
         },game);
     }
 
-    public static void MutePlayer(Player target, float seconds)
+    public static void MutePlayer(GamePlayer target, float seconds)
     {
         if (target == null) return;
         _rpcMute.Invoke((target.PlayerId, seconds, false));
@@ -680,7 +688,7 @@ public static partial class PatchManager
         catch(Exception ex)
         {
             HsgDebug.LogWarning($"未知错误：{ex.Message},触发点：public static List<GamePlayer> GetRandomPlayers()，将返回全部玩家。");
-            return GamePlayer.AllPlayers.ToList();
+            return [.. GamePlayer.AllPlayers];
         }
     }
     /// <summary>
@@ -750,6 +758,18 @@ public static partial class PatchManager
 #endregion
 
 #region PatchManagerClass2
+[HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool))]
+public static class TaskPanelPatch
+{
+    public static void Postfix(HudManager __instance, RoleBehaviour role, bool isActive)
+    {
+        if (!MeetingHud.Instance) return;
+        var openPosition = __instance.TaskPanel.openPosition;
+        openPosition.z = -20f;
+        __instance.TaskPanel.openPosition = openPosition;
+        __instance.TaskPanel.gameObject.SetActive(true);
+    }
+}
 [NebulaPreprocess(PreprocessPhase.PostFixStructure)]
 [NebulaRPCHolder]
 public static partial class PatchManager
@@ -787,7 +807,7 @@ public static partial class PatchManager
         var client = GetClient(player);
         return client?.FriendCode;
     }
-    public static UnityEngine.Color GetPlayerColor(this GamePlayer player)
+    public static Color GetPlayerColor(this GamePlayer player)
     {
         if (player == null) return Color.white;
         var pc = player.VanillaPlayer;

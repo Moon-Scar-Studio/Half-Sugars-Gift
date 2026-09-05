@@ -38,7 +38,7 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
         new[] { "options.role.glimmer.flashcolor.red", "options.role.glimmer.flashcolor.yellow", "options.role.glimmer.flashcolor.cyan", "options.role.glimmer.flashcolor.green", "options.role.glimmer.flashcolor.blue", "options.role.glimmer.flashcolor.purple", "options.role.glimmer.flashcolor.wishY","options.role.glimmer.flashcolor.followtarget" }
         , 0
         );
-
+    Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/GlimmerIcon")?.AsImage();
     public static readonly Glimmer MyRole = new();
     Citation? HasCitation.Citation => Citations.hvtXsvc_hsg;
     public string CodeName => "GR";
@@ -63,7 +63,7 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
                 VirtualKeyInput.Ability,
                 CoolDown,
                 "glimmer.flash",
-                NebulaAPI.AddonAsset.GetResource("glimmer.png")?.AsImage(),
+                NebulaAPI.AddonAsset.GetResource("GlimmerLight.png")?.AsImage(),
                 _ => playerTracker.CurrentTarget != null
                     && playerTracker.CurrentTarget != MyPlayer,
                 _ => left > 0,

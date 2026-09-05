@@ -1,4 +1,4 @@
-#船员
+﻿#船员
 
 "role.maskedDancer.name" : "假面舞者"
 "role.maskedDancer.short" : "舞"
@@ -166,6 +166,35 @@
 "role.Tester.doc" : "测试者是开发者用来测试功能的职业。<br><b>如果你在发行版本发现本职业，请向开发者报告。</b>"
 "role.Tester.short" : "测"
 "options.role.Tester.detail" : "如果你在发行版本发现本职业，请向开发者报告。<br><b>这不应是半糖送给你的礼物之一。</b>"
+ 
+"role.karmatic.name" : "因果使"
+"role.karmatic.blurb" : "美妙的业力又何尝不是你们的保护伞呢"
+"role.karmatic.doc" : "因果使可以使用「因果链」选择一人使其获得业力报应。<br>业力将在下一轮生效。"
+"options.role.karmatic.detail" : "因果使可以使用「因果链」选择一人使其获得业力报应<br><b>这是半糖送给你的礼物之一！</b>"
+"role.karmatic.ability.title" : "固有能力【因果报应】"
+"role.karmatic.doc.causalitychain" : "<b>因果链</b><br>跟随一人<b><color=#00ffff>%FT%秒</color></b>使其获得业力附加。<br>最多使用<b><color=#00ffff>%MaxUses%次</color></b>，冷却为<b><color=#00ffff>%CD%秒</color></b>。"
+"role.karmatic.ability.main" : "你可以使用<b>因果链</b>选中一人，使其在本轮结束后拥有业力附加。<br>然后，%NameDeco%。<br>业力的拥有者在尝试击杀他人时击杀不会生效，并且%TryKillSomebody%。<br><b><color=#00ffff>%MeetingTimes%轮</color></b>后解除业力附加。"
+
+"options.role.karmatic.NameDeco.K.Des" : "<b><color=#00ffff>业力拥有者将会在你眼中获得紫色的「K」后缀。</color></b>"
+"options.role.karmatic.NameDeco.Color.Des" : "<b><color=#00ffff>业力拥有者的名字在你眼中会变为紫色</color></b>"
+"options.role.karmatic.deadkillkarma.true" : "<b><color=#00ffff>业力尝试击杀的人会将业力反杀。</color></b>"
+"options.role.karmatic.deadkillkarma.false" : "<b><color=#00ffff>业力将会自杀</color></b>"
+
+
+"options.role.karmatic.CausalityChainCoolDown" : "因果链冷却时间"
+"options.role.karmatic.followtime" : "附加因果链所需时间"
+"options.role.karmatic.CausalityChainMaxUses" : "因果链最大使用次数"
+"options.role.karmatic.EraseKarmaMeetingTimes" : "业力抹除所需回合"
+"options.role.karmatic.deadkillkarma" : "被害者反杀业力"
+"options.role.karmatic.deadkillkarma.detail" : "启用时，被害者将会直接击杀业力。<br>禁用时，业力将会在尝试击杀前自杀。"
+"options.role.karmatic.NameDeco" : "业力名字装饰类型"
+"options.role.karmatic.NameDeco.K" : "名字后追加「K」"
+"options.role.karmatic.NameDeco.Color" : "将名字设为紫色"
+"options.role.karmatic.NeedImp" : "业力拥有者为伪装者时才进行反噬"
+"options.role.karmatic.NeedImp.detail" : "启用时，业力拥有者不为伪装者时，反噬将不会生效。"
+
+"button.label.CausalityChain" : "因果链"
+"role.karmatic.tips" : "<b>·使用「因果链」附加业力于他人时，业力附加不会立即出现，而是在本轮结束后附加业力。</b>"
 
 #伪装者
 
@@ -228,7 +257,7 @@
 "role.saboteur.short" : "破"
 "role.saboteur.blurb" : "混乱之力"
 "role.saboteur.doc" : "每当一次破坏被成功修复后，永久减少你的击杀冷却时间。<br>破坏期间击杀玩家会额外减少本次破坏期间的击杀冷却时间。<br>永久减少次数与减少数值均由房主设置。"
-"options.role.saboteur.detail" : "破坏狂在破坏后。破坏期间均会获得击杀CD减少的强化。<br><b>这是半糖送给你的礼物之一！</b>"
+"options.role.saboteur.detail" : "破坏狂在破坏后、破坏期间均会获得击杀CD减少的强化。<br><b>这是半糖送给你的礼物之一！</b>"
 "options.role.saboteur.killcooldown" : "击杀冷却"
 "options.role.saboteur.reduceSabotage" : "每次破坏永久减少"
 "options.role.saboteur.reduceKill" : "破坏期间击杀减少"
@@ -339,6 +368,19 @@
 "button.label.witchJudge.punish" : "惩罚！"
 "button.label.witchJudge.execute" : "处刑"
 
+
+"role.taoist.name" : "道士"
+"role.taoist.blurb" : "收下此符、即可护你平安"
+"role.taoist.doc" : ""
+"role.taoist.ability.title" : ""
+"role.taoist.ability.main" : ""
+"role.taoist.doc.amulet" : ""
+"role.taoist.tips" : ""
+"options.role.taoist.amuletCooldown" : "符咒冷却"
+"role.taoist.amuletApplied" : "得此符即可护你平安"
+"role.taoist.amuletSaved" : "此符护你一命！"
+
+
 #附加
 
 "role.blitz.name" : "闪击"
@@ -416,41 +458,10 @@
 "role.weakness.short" : "弱"
 "role.weakness.generalBlurb" : "你好弱唉"
 
-
-"role.publicmiraclist.name" : "公开的神迹者" 
-"role.publicmiraclist.short" : "公神迹"
-"role.publicmiraclist.generalBlurb" : "我就是「神迹」！"
-"role.publicmiraclist.doc" : "你是神迹者公开身份的证明。"
-"options.role.publicmiraclist.detail" : "公开的神迹者是神迹者公开身份的证明。<br><b>这是半糖送给你的礼物之一！</b>" 
-
-"role.divineseed.name" : "神种" 
-"role.divineseed.short" : "神种"
-"role.divineseed.generalBlurb" : "奇迹之种"
-"role.divineseed.doc" : "你是被奇迹选中的奇迹之种。你死亡时根据房主设置，会通报给神迹者。"
-"options.role.divineseed.detail" : "神种是奇迹建立的连接。<br><b>这是半糖送给你的礼物之一！</b>" 
-
-"role.givedivineseed.name" : "神种给予"
-"role.givedivineseed.short" : "种给"
-"role.givedivineseed.generalBlurb" : "给予者"
-"role.givedivineseed.doc" : "我认为你没必要看这个状态附加。"
-"options.role.givedivineseed.detail" : "<b>这是半糖送给你的礼物之一！</b>"
-
-"role.miracle.name" : "奇迹"
-"role.miracle.short" : "奇"
-"role.miracle.generalBlurb" : "属于你我的奇迹"
-"role.miracle.doc" : "你的职业可以被神迹者重新编织。编织后，你可以获得 给予别人「神种」的能力。<br>根据房主设置，你和神种死亡后可能会有对于神迹者的提示。"
-"options.role.miracle.detail" : "奇迹是神迹者最终编织的产物。<br><b>这是半糖送给你的礼物之一！</b>"
-
-"role.miracletouched.name" : "奇迹之人" 
-"role.miracletouched.short" : "奇迹人"
-"role.miracletouched.generalBlurb" : "你我的奇迹"
-"role.miracletouched.doc" : "你是被神迹者选中的奇迹之人。<br>别让他失望哦。"
-"options.role.miracletouched.detail" : "奇迹之人被神迹者选中的奇迹之人。<br><b>这是半糖送给你的礼物之一！</b>" 
-
 #幽灵
 "role.glimmer.name" : "烁光"
 "role.glimmer.short" : "光"
-"role.glimmer.blurb" : "零星的光芒"
+"role.glimmer.blurb" : "绝望中的一丝光芒"
 "role.glimmer.doc" : "可以选择一名玩家，使其屏幕闪光。"
 
 "options.role.glimmer.uses" : "使用次数"
@@ -465,7 +476,12 @@
 "options.role.glimmer.flashcolor.blue" : "<b><color=#0000FF>蓝色</color></b>"
 "options.role.glimmer.flashcolor.purple" : "<b><color=#800080>紫色</color></b>"
 "options.role.glimmer.flashcolor.wishY" : "<b><color=#FFE699>淡黄</color></b>"
-"options.role.glimmer.flashcolor.followtarget" : "跟随玩家颜色"
+"options.role.glimmer.flashcolor.followtarget" : "跟随目标玩家颜色"
+
+"role.karma.name" : "业力"
+"role.karma.generalBlurb" : "你的报应"
+"role.karma.doc" : "当你尝试击杀时，根据房主设置，你会被反杀或者自杀。<br>根据房主设置，本附加在X轮后自动移除。"
+"options.role.karma.detail" : "如果业力尝试击杀，业力将会死亡。"
 
 #死因
 
@@ -478,6 +494,8 @@
 "state.weakness" : "脆弱诅咒"
 "state.ashed" : "还原"
 "state.executedByJudge" : "处刑"
+"state.taoistSacrifice" : "护身牺牲"
+"state.amuletTriggered" : "反噬"
 
 #阵营
 "teams.Havenger" : "寻仇者"
@@ -488,6 +506,9 @@
 "witchJudgeWin" : "魔女审判长胜利"
 "witchJudgeExtraWin" : "魔女审判长胜利"
 "end.extra.witchJudgeExtraWin" : "<color=#FFFFFF>+</color>魔女审判长"
+"teams.taoist" : "道士"
+"taoistWin" : "道士胜利"
+"taoistExtraWin" : "+ 道士"
 
 #设置
 "exit0": "<color=#FFFFFF>退出中</color>"
@@ -497,7 +518,9 @@
 "exit4": "<color=#FF3333>退出中....</color>"
 "exit5": "<color=#FF0000>退出中.....</color>"
 
-# MVS 设置
+# 配置项
+"options.hsg" : "Half Sugar's Gift"
+
 "options.hsg.mvs.holder.title" : "更多投票设置"
 "options.hsg.mvs.holder.detail" : "更多的投票设置，由 Half Sugar's Gift 添加"
 "options.hsg.mvs.enablevotetimechange" : "更改剩余投票时间 - 本项有暂未修复的诸多问题，谨慎开启"
@@ -508,6 +531,11 @@
 "options.hsg.mvs.disableonthresholdreached" : "达到阈值时禁用"
 "options.hsg.mvs.disableonthresholdreached.detail" : "当剩余人数小于等于该配置项的数量时，禁用更改剩余投票时间。"
 
+"options.hsg.fm.holder.title" : "娱乐设置"
+"options.hsg.fm.holder.detail" : "HSG添加的娱乐设置，内部均为娱乐功能。"
+"options.hsg.fm.enableMiniMode" : "启用全员迷你模式"
+"options.hsg.fm.enableMiniMode.detail" : "启用后，所有人在游戏开局时视觉上均会变小，游戏结束后恢复。"
+"options.hsg.fm.miniScale" : "迷你缩放量"
 # 指令
 "cmd.suicide.inlobby" : "大厅中无法自杀"
 "cmd.github.open" : "已打开HSG的GitHub"
@@ -517,3 +545,12 @@
 "mute.muteend" : "你的禁言结束了。"
 "help.tabs.stars" : "星标"
 "help.stars.empty" : "暂无星标，点击职业详情页的星标按钮添加"
+# HSG 附加：夜盲症 (Nyctalope)
+
+"role.nyctalope.name" : "夜盲症"
+"role.nyctalope.short" : "夜"
+"role.nyctalope.generalBlurb" : "灯一灭，就成了半个瞎子。"
+"role.nyctalope.doc" : "当房间停电/关灯时，你的视野会变得非常受限。视野大小可以在此附加的选项里设置。"
+"options.role.nyctalope.detail" : ""
+"options.modifier.nyctalope.darkSight" : "关灯时视野"
+"options.modifier.nyctalope.darkSight.detail" : ""

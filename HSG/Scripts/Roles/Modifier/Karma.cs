@@ -21,7 +21,7 @@ namespace NebulaN.Roles.Modifier
         public Citation Citation => Citations.hvtXsvc_hsg;
         bool ISpawnable.IsSpawnable => false;
         RuntimeModifier RuntimeAssignableGenerator<RuntimeModifier>.CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
-
+        Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/KarmaticIcon.png").AsImage();
         public class Instance : RuntimeAssignableTemplate, RuntimeModifier
         {
             bool ProcessingKarma = false;
@@ -31,21 +31,22 @@ namespace NebulaN.Roles.Modifier
             public Instance(GamePlayer player) : base(player) { }
             void RuntimeAssignable.OnActivated()
             {
-                if(AmOwner)
+                if (AmOwner)
                     EraseSelfModiCounts = Karmatic.EraseKarmaMeetingTimes;
-            }
-            [Local]
-            void OnKillPlayer(PlayerMurderedEvent ev)
-            {
-                
             }
             [Local]
             void KillSelf(PlayerCheckKilledEvent ev)
             {
                 if (ev.Killer != MyPlayer) return;
+                if (ev.Player == ev.Killer) return;
+                
                 if (ProcessingKarma) return;
 
                 ProcessingKarma = true;
+                if (Karmatic.NeedImp)
+                    if (MyPlayer.Role.Role.Category != RoleCategory.ImpostorRole)
+                        return;
+
                 ev.Result = KillResult.Guard;
                 AmongUsUtil.PlayQuickFlash(Cor.Violet);
                 if (Karmatic.DeadKillKarma)
@@ -56,7 +57,7 @@ namespace NebulaN.Roles.Modifier
                 {
                     MyPlayer.Suicide(PlayerState.Dead, null, KillParameter.NormalKill);
                 }
-                
+
                 ProcessingKarma = false;
             }
             [Local]
