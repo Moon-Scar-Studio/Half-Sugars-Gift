@@ -736,21 +736,8 @@ public static partial class PatchManager
         Initialize();
         _titleEventSubscribed = false;
         HostSendRpc.RegisterCustomRpc("HSG_SetTitle", OnReceiveSetTitle);
-        if (GameOperatorManager.Instance != null)
-        {
-            //SubscribeTitleEvent();
-        }
-        if (GameOperatorManager.Instance != null)
-        {
-            GameOperatorManager.Instance.Subscribe<GameStartEvent>(_ =>
-            {
-                _receivedTitleInfo.Clear();
-                if (_myTitleId > 0)
-                {
-                    ApplyTitleLocally(_myTitleId);
-                }
-            }, new SimpleLifespan());
-        }
+        // 牛仔对决开局初始化改由 CowboyDuelGameStartPatch 补丁触发（GameOperatorManager 每局重建，加载期订阅无效），
+        // 标题刷新同理已移入各自补丁/模块生命周期。
         HsgDebug.Log("插件加载成功");
     }
 

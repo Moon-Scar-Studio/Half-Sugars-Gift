@@ -1,3 +1,16 @@
+#游戏模式
+
+"gamemode.hsg.cowboyDuel" : "为了自由"
+
+#任务
+"task.hsg.cowboyDuel.name" : "组装枪械"
+"task.hsg.cowboyDuel.assembly" : "组装枪械"
+"task.hsg.cowboyDuel.loadBullet" : "将子弹装入弹匣"
+"task.hsg.cowboyDuel.loadMagazine" : "将弹匣装入枪"
+"task.hsg.cowboyDuel.ready" : "枪械组装完成"
+"task.hsg.cowboyDuel.aim" : "举枪"
+"task.hsg.cowboyDuel.shoot" : "射击"
+
 #船员
 
 "role.maskedDancer.name" : "假面舞者"
