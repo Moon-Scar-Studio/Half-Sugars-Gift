@@ -1,5 +1,5 @@
 ﻿
-using NebulaN.Roles.crewmate;
+using NebulaN.Roles.Crewmate;
 
 namespace NebulaN.Roles.Ghost;
 
@@ -13,15 +13,12 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
     )
     {
     }
-
-
     static IntegerConfiguration Uses =
         NebulaAPI.Configurations.Configuration(
             "options.role.glimmer.uses",
             (1, 10),
             1
         );
-
     static FloatConfiguration CoolDown =
         NebulaAPI.Configurations.Configuration(
             "options.role.glimmer.cooldown",
@@ -29,7 +26,6 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
             15f,
             FloatConfigurationDecorator.Second
         );
-
     static FloatConfiguration FlashDuration =
         NebulaAPI.Configurations.Configuration(
             "options.role.glimmer.flashDuration",
@@ -38,11 +34,11 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
             FloatConfigurationDecorator.Second
         );
     static ValueConfiguration<int> FlashColor = NebulaAPI.Configurations.Configuration(
-        "",
-        new[] { "options.role.glimmer.flashcolor.red", "options.role.glimmer.flashcolor.yellow", "options.role.glimmer.flashcolor.cyan", "options.role.glimmer.flashcolor.green", "options.role.glimmer.flashcolor.blue", "options.role.glimmer.flashcolor.purple", "options.role.glimmer.flashcolor.wishY" }
+        "options.role.glimmer.flashcolor",
+        new[] { "options.role.glimmer.flashcolor.red", "options.role.glimmer.flashcolor.yellow", "options.role.glimmer.flashcolor.cyan", "options.role.glimmer.flashcolor.green", "options.role.glimmer.flashcolor.blue", "options.role.glimmer.flashcolor.purple", "options.role.glimmer.flashcolor.wishY","options.role.glimmer.flashcolor.followtarget" }
         , 0
         );
-
+    Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/GlimmerIcon")?.AsImage();
     public static readonly Glimmer MyRole = new();
     Citation? HasCitation.Citation => Citations.hvtXsvc_hsg;
     public string CodeName => "GR";
@@ -67,7 +63,7 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
                 VirtualKeyInput.Ability,
                 CoolDown,
                 "glimmer.flash",
-                NebulaAPI.AddonAsset.GetResource("glimmer.png")?.AsImage(),
+                NebulaAPI.AddonAsset.GetResource("GlimmerLight.png")?.AsImage(),
                 _ => playerTracker.CurrentTarget != null
                     && playerTracker.CurrentTarget != MyPlayer,
                 _ => left > 0,
@@ -79,14 +75,14 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
                 var target = playerTracker.CurrentTarget;
                 if (target == null)
                     return;
-                PatchManager.RpcFlashCustom.Invoke(
-                    (
-                        target.PlayerId,
-                        ColorHelper.ColorToHex(GetConfigColor(FlashColor).ToUnityColor()),
-                        0.2f,
-                        FlashDuration
-                    )
-                );
+                if (FlashColor.GetValue() != 7)
+                {
+                    PatchManager.RpcFlashCustom.Invoke((target.PlayerId, ColorHelper.ColorToHexRGB(GetConfigColor(FlashColor).ToUnityColor()), 0.2f, FlashDuration));
+                }
+                else if (FlashColor.GetValue() == 7)
+                {
+                    PatchManager.RpcFlashCustom.Invoke((target.PlayerId,ColorHelper.ColorToHexRGB(target.GetPlayerColor()),0.2f,FlashDuration));
+                }
                 left--;
                 if (left > 0)
                     button.UpdateUsesIcon(left.ToString());

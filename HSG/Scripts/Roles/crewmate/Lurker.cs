@@ -1,58 +1,31 @@
 ﻿namespace NebulaN.Roles.Crewmate;
+
 public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
-    RuntimeAssignableGenerator<RuntimeRole>,IAssignableDocument
+    RuntimeAssignableGenerator<RuntimeRole>, IAssignableDocument
 {
-    static Lurker()
-    {
-        GameOperatorManager.Instance?.Subscribe<GameStartEvent>(GameStart, null);
-    }
-
-    [OnlyHost]
-    private static void GameStart(GameStartEvent ev)
-    {
-        bool _Alive = GamePlayer.AllPlayers.Any(p => !p.IsDead && p.Role is Lurker.Instance);
-        if (!_Alive) return;
-
-        GameOperatorManager.Instance.Subscribe<PlayerBlockWinEvent>(BlockWin, ev.Game);
-    }
-
-    [OnlyHost]
-    private static void BlockWin(PlayerBlockWinEvent ev)
-    {
-        bool _Alive = GamePlayer.AllPlayers.Any(p => !p.IsDead && p.Role is Lurker.Instance);
-        if (!_Alive) return;
-
-        bool _isCrewmateWin = GamePlayer.AllPlayers.Any(p => ev.LastWinners.Test(p) && p.Role.Role.Team != NebulaTeams.CrewmateTeam);
-        if (!_isCrewmateWin) return;
-
-        ev.SetBlockedIf(true);
-        Instance.RpcSetBool.Invoke();
-    }
-
-
-    static private BoolConfiguration CanKillConfig = NebulaAPI.Configurations.Configuration(
+    static BoolConfiguration CanKillConfig = NebulaAPI.Configurations.Configuration(
     "options.role.lurker.ckc",
     true
     );
-    static private FloatConfiguration Cooldown = NebulaAPI.Configurations.Configuration(
+    static FloatConfiguration Cooldown = NebulaAPI.Configurations.Configuration(
         "options.role.lurker.cooldown",
         (5f, 60f, 3f),
         25,
         FloatConfigurationDecorator.Second,
         () => CanKillConfig
     );
-    static private BoolConfiguration NoTask = NebulaAPI.Configurations.Configuration(
+    static BoolConfiguration NoTask = NebulaAPI.Configurations.Configuration(
         "options.role.lurker.nt",
         true
         );
 
 
-    private Lurker() : base(
+    Lurker() : base(
         "lurker",
         Cor.LurkerCor,
         RoleCategory.CrewmateRole,
         NebulaTeams.CrewmateTeam,
-        new Virial.Configuration.IConfiguration[] { Cooldown,NoTask,CanKillConfig }
+        new Virial.Configuration.IConfiguration[] { Cooldown, NoTask, CanKillConfig }
     )
     {
         // ConfigurationHolder!.Illustration = NebulaAPI.AddonAsset.GetResource("BigPic/Lurker.png")?.AsImage(115f);
@@ -60,18 +33,14 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
     // Virial.Media.Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/LurkerIcon.png")?.AsImage();
 
     Citation? HasCitation.Citation => Citations.hvtXsvc_hsg;
-
     public static readonly Lurker MyRole = new Lurker();
-
     public RuntimeRole CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
-
     IEnumerable<AssignableDocumentReplacement> IAssignableDocument.GetDocumentReplacements()
     {
-        yield return new AssignableDocumentReplacement("%CD%", Cooldown.ToString());
-        yield return new AssignableDocumentReplacement("%CANKILL%", CanKillConfig?Language.Translate("role.lurker.ck.true") :Language.Translate("role.lurker.ck.false"));
-        yield return new AssignableDocumentReplacement("%NT%",NoTask?Language.Translate("role.lurker.nt.true"):Language.Translate("role.lurker.nt.false"));
+        yield return new AssignableDocumentReplacement("%CD%", Cooldown.GetValue().ToString());
+        yield return new AssignableDocumentReplacement("%CANKILL%", CanKillConfig ? Language.Translate("role.lurker.ck.true") : Language.Translate("role.lurker.ck.false"));
+        yield return new AssignableDocumentReplacement("%NT%", NoTask ? Language.Translate("role.lurker.nt.true") : Language.Translate("role.lurker.nt.false"));
     }
-
     public class Instance : RuntimeAssignableTemplate, RuntimeRole, RuntimeAssignable, IGameOperator
     {
         void IGameOperator.OnReleased() { }
@@ -79,9 +48,7 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
         bool RuntimeAssignable.InvalidateCrewmateTask => NoTask;
         public DefinedRole Role => MyRole;
         public Instance(GamePlayer player) : base(player) { }
-
         ModAbilityButton? Btn;
-        
         static public bool CanKill = false;
         private bool _isAlive = true;
         void RuntimeAssignable.OnActivated()
@@ -98,13 +65,13 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
                 "lurker.kill",
                 null,
                 _ => !MyPlayer.IsDead && CanKill,
-                _ => !MyPlayer.IsDead&& CanKillConfig,
+                _ => !MyPlayer.IsDead && CanKillConfig,
                 false
             );
             Btn.OnClick = (button) =>
             {
                 var target = playerTracker.CurrentTarget;
-                if (target != null) 
+                if (target != null)
                 {
                     MyPlayer.MurderPlayer(target, PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill, KillCondition.NormalKill);
                 }
@@ -112,12 +79,18 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
             };
             GameOperatorManager.Instance?.Subscribe<EndCriteriaPreMetEvent>(OnEndCriteriaPreMet, this);
         }
+        [OnlyHost]
+        private void OnEndCriteriaPreMet(EndCriteriaPreMetEvent ev)
+        {
+            if (!_isAlive) return;
+            var crewmateEnd = NebulaGameEnds.CrewmateGameEnd.Get();
+            if (ev.GameEnd == crewmateEnd) return;
+            ev.Reject();
+        }
         static public RemoteProcess RpcSetBool = new("SetBool_H", _ =>
         {
             CanKill = true;
         });
-
-
         [OnlyHost]
         void NeedWin(PlayerDieEvent ev)
         {
@@ -132,16 +105,9 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
             }
             var AlivePlayers = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
             int CrewCount = AlivePlayers.Count(p => p.Role.Role.Category == RoleCategory.CrewmateRole);
-            if (AlivePlayers.Count==CrewCount) NebulaAPI.CurrentGame?.TriggerGameEnd(NebulaGameEnds.CrewmateGameEnd, GameEndReason.Situation);
+            if (AlivePlayers.Count == CrewCount) NebulaAPI.CurrentGame?.TriggerGameEnd(NebulaGameEnds.CrewmateGameEnd, GameEndReason.Situation);
         }
-        [OnlyHost]
-        private void OnEndCriteriaPreMet(EndCriteriaPreMetEvent ev)
-        {
-            if (!_isAlive) return;
-            var crewmateEnd = NebulaGameEnds.CrewmateGameEnd.Get();
-            if (ev.GameEnd == crewmateEnd) return;
-            ev.Reject();
-        }
+        void EraseCanKill(GameStartEvent ev) => CanKill = false;
         [OnlyMyPlayer]
         void OnDie(PlayerDieEvent ev)
         {

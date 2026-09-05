@@ -1,4 +1,5 @@
 ﻿
+
 namespace NebulaN.Roles.Crewmate;
 
 public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenerator<RuntimeRole>, IAssignableDocument, HasCitation
@@ -12,8 +13,7 @@ public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenera
     static IntegerConfiguration NeedTasksCount = NebulaAPI.Configurations.Configuration(
         "options.role.dilemma.NeedTasksCount", (1,15,1),1,()=>AddMaxUsesWhenDoTask
         );
-
-    private Dilemma() : base(
+    Dilemma() : base(
         "dilemma",
         Virial.Color.CrewmateColor,
         RoleCategory.CrewmateRole,
@@ -23,7 +23,6 @@ public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenera
     {
 
     }
-
     public RuntimeRole CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
     public static readonly Dilemma MyRole = new Dilemma();
 
@@ -54,7 +53,6 @@ public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenera
             if (!AmOwner) return;
             usesLeft = MaxUses;
             int Action = -1;
-
             button = NebulaAPI.Modules.AbilityButton(
                 this,
                 MyPlayer,
@@ -77,6 +75,7 @@ public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenera
                 button.StartCoolDown();
             };
         }
+
         [Local]
         void DoTask(PlayerTaskCompleteLocalEvent ev)
         {

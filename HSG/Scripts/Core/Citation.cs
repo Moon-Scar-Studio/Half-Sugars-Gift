@@ -1,4 +1,4 @@
-namespace HalfSugarGift.Core;
+﻿namespace HalfSugarGift.Core;
 
 public static class Citations
 {
@@ -21,7 +21,6 @@ public static class Citations
         ),
         "https://www.innersloth.com/games/among-us/"
     );
-
     public static Citation Hellos497 { get; private set; } = new(
         "Hellos497",
         NebulaAPI.AddonAsset.GetResource("Citat/HalfSugarGift_Hellos497.png")?.AsImage(125f),
@@ -40,5 +39,13 @@ public static class Citations
             new RawTextComponent("The Other Roles")
         ),
         "https://github.com/TheOtherRolesAU/TheOtherRoles"
+    );
+    public static Citation LightInDark { get; private set; } = new(
+        "Light in Dark",NebulaAPI.AddonAsset.GetResource("Citat/LightInDark.png")?.AsImage(125f),
+        new ColorTextComponent(
+            Cor.impRed,
+            new RawTextComponent("Light in Dark")
+        ),
+        "https://github.com/LightInDark/LightInDark"
     );
 }

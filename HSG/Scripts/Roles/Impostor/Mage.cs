@@ -5,22 +5,33 @@ using static HalfSugarGift.Core.Patch.Cor;
 
 namespace HalfSugarGift.Roles.Impostor;
 
+/// <summary>
+/// 魔法师，内鬼阵营。
+/// 第一人格给目标施加脆弱，全死了切换第二人格， 还原范围攻击，回第一人格
+/// 不具备普通击杀能力。
+/// </summary>
+
 public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
     RuntimeAssignableGenerator<RuntimeRole>, IAssignableDocument
 {
+    // 切换第二人格所需击杀人数
     static IntegerConfiguration RequiredKillCount = NebulaAPI.Configurations.Configuration(
         "options.role.mage.requiredKillCount", (1, 5, 1), 2
     );
+    // 脆弱技能冷却
     static FloatConfiguration WeakCooldown = NebulaAPI.Configurations.Configuration(
         "options.role.mage.weakCooldown", (5f, 60f, 1f), 20f, FloatConfigurationDecorator.Second
     );
+    // 还原技能范围
     static FloatConfiguration RestoreRadius = NebulaAPI.Configurations.Configuration(
         "options.role.mage.restoreRadius", (0.5f, 3f, 0.1f), 1.5f,
         decorator: val => val + "x"
     );
+    // 还原技能冷却
     static FloatConfiguration RestoreCooldown = NebulaAPI.Configurations.Configuration(
         "options.role.mage.restoreCooldown", (5f, 60f, 1f), 20f, FloatConfigurationDecorator.Second
     );
+    // 脆弱到期清除配置
     internal static BoolConfiguration WeaknessEnableRoundExpiry = NebulaAPI.Configurations.Configuration(
         "options.role.mage.weaknessEnableRoundExpiry", false
     );
@@ -48,6 +59,8 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
 
     Virial.Media.Image? DefinedAssignable.IconImage =>
         NebulaAPI.AddonAsset.GetResource("Smallicon/MageIcon.png")?.AsImage();
+
+    // 文档用技能图标
     internal static readonly Virial.Media.Image? WeakIcon =
         NebulaAPI.AddonAsset.GetResource("Weak.png")?.AsImage(115f);
     internal static readonly Virial.Media.Image? RestoreIcon =
@@ -67,6 +80,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
         yield break;
     }
 
+    // 死因标签、脆弱名字灰色
     public static readonly TranslatableTag AshedState = new TranslatableTag("state.ashed");
     public static readonly TranslatableTag WeaknessState = new TranslatableTag("state.weakness");
     private static readonly Virial.Color WeakGray = new(0.35f, 0.35f, 0.35f);
@@ -77,15 +91,16 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
         DefinedRole RuntimeRole.Role => MyRole;
         bool RuntimeRole.HasVanillaKillButton => false;
         bool IPlayerAbility.HideKillButton => true;
-
+        // 技能按钮用图标（不同尺寸）
         private static readonly Virial.Media.Image? WeakButtonIcon =
             NebulaAPI.AddonAsset.GetResource("Weak.png")?.AsImage(100f);
         private static readonly Virial.Media.Image? RestoreButtonIcon =
                 NebulaAPI.AddonAsset.GetResource("RestorerButton.png")?.AsImage(100f);
 
-        private bool _switched;              
-        private int _weakUsesLeft;          
-        private readonly List<byte> _weakenedPlayerIds = new(); 
+        //  状态 
+        private bool _switched;                    // 是否处于第二人格
+        private int _weakUsesLeft;                 // 当前轮剩余脆弱使用次数
+        private readonly List<byte> _weakenedPlayerIds = new(); // 被施法的玩家ID
 
         private const string CamoTag = "MageCamo";
         private float _camoCheckTimer;
@@ -93,6 +108,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
         private ModAbilityButton? _weakButton;
         private ModAbilityButton? _restoreButton;
 
+        // === 通过反射获取 UnknownOutfit（隐蔽者同款伪装外观） ===
         private static OutfitDefinition? GetUnknownOutfit()
         {
             var game = NebulaAPI.CurrentGame;
@@ -100,10 +116,12 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
             var prop = game.GetType().GetProperty("UnknownOutfit",
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             return prop?.GetValue(game) as OutfitDefinition;
+
         }
 
         public Instance(GamePlayer player) : base(player) { }
 
+        // 显示带淡入+保持+淡出效果的标题
         private static void SetTextWithFade(TitleShower? shower, string text, Virial.Color color, float holdDuration = 1f, bool shake = true)
         {
             if (shower == null) return;
@@ -118,6 +136,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
             {
                 var dt = Time.deltaTime;
 
+                // 抖动效果
                 if (shake)
                 {
                     shakeTimer -= dt;
@@ -130,6 +149,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
                     }
                 }
 
+                // 透明度动画：淡入 → 保持 → 淡出
                 if (fadeInTimer > 0f)
                 {
                     fadeInTimer -= dt;
@@ -159,6 +179,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
             var tracker = NebulaAPI.Modules.PlayerTracker(this, MyPlayer);
             tracker.SetColor(MyRole.RoleColor);
 
+            // === 脆弱诅咒按钮（第一人格） ===
             _weakButton = NebulaAPI.Modules.AbilityButton(
                 this, MyPlayer,
                 VirtualKeyInput.Ability,
@@ -184,6 +205,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
                 _weakButton.StartCoolDown();
             };
 
+            // === 还原按钮（第二人格） ===
             _restoreButton = NebulaAPI.Modules.AbilityButton(
                 this, MyPlayer,
                 VirtualKeyInput.SidekickAction,
@@ -197,13 +219,16 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
             {
                 if (!_switched || MyPlayer.IsDead) return;
                 RpcRestoreKill.Invoke(MyPlayer.PlayerId);
+                // 回归第一人格
                 SwitchBackToFirst();
             };
         }
 
+        // === 回归第一人格 ===
         private void SwitchBackToFirst()
         {
             _switched = false;
+            // 移除所有玩家的伪装
             foreach (var p in NebulaGameManager.Instance!.AllPlayerInfo)
                 p.RemoveOutfitByTag(CamoTag);
             _weakUsesLeft = RequiredKillCount;
@@ -214,6 +239,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
                 Language.Translate("role.mage.backToFirst"), Cor.impRed);
         }
 
+        // === 还原 RPC（仅房主执行） ===
         private static readonly RemoteProcess<byte> RpcRestoreKill = new(
             "Mage.RestoreKill",
             (mageId, _) =>
@@ -233,26 +259,33 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
             }
         );
 
+        // === 监听玩家死亡 → 检查是否所有脆弱目标已死亡 ===
         [Local]
         void OnPlayerDie(PlayerDieEvent ev)
         {
             if (MyPlayer.IsDead) return;
 
+            // 通知法师
             if (_weakenedPlayerIds.Contains(ev.Player.PlayerId))
             {
+                // 临时使用 TitleShower 显示提示
                 SetTextWithFade(NebulaAPI.CurrentGame?.GetModule<TitleShower>(),
                     Language.Translate("role.mage.weaknessTriggered")
                         .Replace("%PLAYER%", ev.Player.Name),
                     Cor.impRed);
             }
 
+            // 第二人格不受影响
             if (_switched) return;
 
+            // 移除已死亡的脆弱目标
             _weakenedPlayerIds.Remove(ev.Player.PlayerId);
 
+            // 所有脆弱目标死亡且已无剩余次数 → 切换第二人格
             if (_weakenedPlayerIds.Count == 0 && _weakUsesLeft == 0)
             {
                 _switched = true;
+                // 对其他所有存活玩家应用伪装外观（灰色无装饰无名字）
                 var unknown = GetUnknownOutfit();
                 if (unknown != null)
                 {
@@ -262,11 +295,14 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
                             p.AddOutfit(new OutfitCandidate(unknown, CamoTag, OutfitPriority.Camouflage, true));
                     }
                 }
+                // 临时使用 TitleShower 显示提示
                 SetTextWithFade(NebulaAPI.CurrentGame?.GetModule<TitleShower>(),
                     Language.Translate("role.mage.switched"), Cor.impRed);
             }
         }
 
+        // === 名字装饰 ===
+        // 第一人格：灰色标记脆弱目标（仅法师可见）
         [Local]
         void DecorateWeaknessName(PlayerDecorateNameEvent ev)
         {
@@ -275,17 +311,18 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
                 ev.Color = WeakGray;
         }
 
+        // === 第二人格视觉特效 ===
         void OnUpdateCamera(CameraUpdateEvent ev)
         {
             if (!AmOwner) return;
             if (_switched && !MyPlayer.IsDead)
             {
-                ev.UpdateSaturation(0f, true);   // 黑白，去色
-                ev.UpdateBrightness(1.15f, true); // 提亮
+                ev.UpdateSaturation(0f, true);   // 黑白去色
+                ev.UpdateBrightness(1.15f, true); // 稍提亮（灰白感）
             }
         }
 
-        // === AI真的很好用。第二人格期间每 2 秒检测一次：确保所有玩家（除魔法使自己）都处于伪装状态 ===
+        // === 第二人格期间每 2 秒检测一次：确保所有玩家（除魔法使自己）都处于伪装状态 ===
         [Local]
         void OnUpdate(GameUpdateEvent ev)
         {
