@@ -25,6 +25,8 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
     {
         CowboyDuelState.Reset();
         CowboyDuelInteraction.Reset();
+        // 剩一人时强制胜利（死亡与掉线都触发 PlayerDieOrDisconnectEvent）
+        GameOperatorManager.Instance?.Subscribe<PlayerDieOrDisconnectEvent>(_ => CheckLastPlayer(), new SimpleLifespan());
         if (AmongUsClient.Instance.AmHost)
         {
             CowboyDuelInteraction.Create();
@@ -36,6 +38,18 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
             }
         }
         HsgDebug.Log("[HSG] 牛仔对决已开始。");
+    }
+
+    /// <summary>只剩一名存活玩家时宣布其胜利（仅房主执行）。</summary>
+    private static void CheckLastPlayer()
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+        var alive = GamePlayer.AllPlayers.Where(p => !p.IsDead).ToList();
+        if (alive.Count != 1) return;
+
+        var winners = BitMasks.AsPlayer();
+        winners.Add(alive[0]);
+        NebulaGameManager.Instance?.RpcInvokeForciblyWin(CowboyDuelWin, (int)winners.AsRawPattern);
     }
 
     /// <summary>记录玩家按顺序组装枪械，并返回是否组装完成。</summary>
@@ -99,13 +113,11 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
         shooter.MurderPlayer(target, PlayerState.Sniped, EventDetail.Kill, KillParameter.RemoteKill);
         var winners = BitMasks.AsPlayer();
         winners.Add(shooter);
-        NebulaGameEnd.RpcSendGameEnd(
+        // FreePlay 容器 AllowSpecialGameEnd=false 会挡 RpcSendGameEnd，
+        // 参考 AeroGuesser：特殊模式用强制胜利 RPC 结束游戏
+        NebulaGameManager.Instance?.RpcInvokeForciblyWin(
             CowboyDuelGameModeModule.CowboyDuelWin,
-            (int)winners.AsRawPattern,
-            0,
-            GameEndReason.Special,
-            CowboyDuelGameModeModule.CowboyDuelWin,
-            GameEndReason.Special
+            (int)winners.AsRawPattern
         );
         return true;
     }

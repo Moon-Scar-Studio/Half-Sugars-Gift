@@ -45,12 +45,13 @@ public class MoreVoteSettings : AbstractModule<Game>, IGameOperator
 
     private IEnumerator CoWaitVotingPhase()
     {
-        while (MeetingHud.Instance == null || MeetingHud.Instance.state == MeetingHud.MeetingStates.Discussion)
+        // 参考 Nebula：会议状态用 CurrentState / VoteStates 枚举
+        while (MeetingHud.Instance == null || MeetingHud.Instance.CurrentState == MeetingHud.VoteStates.Discussion)
             yield return null;
 
         while (MeetingHud.Instance != null &&
-               MeetingHud.Instance.state != MeetingHud.MeetingStates.NotVoted &&
-               MeetingHud.Instance.state != MeetingHud.MeetingStates.Voted)
+               MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.NotVoted &&
+               MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.Voted)
             yield return null;
 
         if (!AmongUsClient.Instance.AmHost) yield break;
@@ -62,7 +63,7 @@ public class MoreVoteSettings : AbstractModule<Game>, IGameOperator
     void OnPlayerVote(PlayerVoteCastEvent ev)
     {
         if (_hasAdjusted || !EnableVoteTimeChange) return;
-        if (MeetingHud.Instance == null || MeetingHud.Instance.state != MeetingHud.MeetingStates.Voted)
+        if (MeetingHud.Instance == null || MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.Voted)
             return;
         CheckAndAdjust();
     }
@@ -71,7 +72,7 @@ public class MoreVoteSettings : AbstractModule<Game>, IGameOperator
     void OnPlayerDie(PlayerDieEvent ev)
     {
         if (_hasAdjusted || !EnableVoteTimeChange) return;
-        if (MeetingHud.Instance == null || MeetingHud.Instance.state != MeetingHud.MeetingStates.Voted)
+        if (MeetingHud.Instance == null || MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.Voted)
             return;
         CheckAndAdjust();
     }
@@ -80,7 +81,7 @@ public class MoreVoteSettings : AbstractModule<Game>, IGameOperator
     void OnPlayerDisconnect(PlayerDisconnectEvent ev)
     {
         if (_hasAdjusted || !EnableVoteTimeChange) return;
-        if (MeetingHud.Instance == null || MeetingHud.Instance.state != MeetingHud.MeetingStates.Voted)
+        if (MeetingHud.Instance == null || MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.Voted)
             return;
         CheckAndAdjust();
     }
@@ -96,9 +97,9 @@ public class MoreVoteSettings : AbstractModule<Game>, IGameOperator
         foreach (var state in meeting.playerStates)
         {
             if (state == null) continue;
-            var player = GamePlayer.GetPlayer(state.PlayerId);
+            var player = GamePlayer.GetPlayer(state.TargetPlayerId);
             if (player == null || player.IsDead || player.IsDisconnected) continue;
-            if (!state.DidVote && state.VotedForId == 252)
+            if (!state.DidVote && state.VotedFor == 252)
                 remaining++;
         }
 

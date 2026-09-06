@@ -1,4 +1,4 @@
-﻿/*
+/*
  * 赛博佛祖 镇楼
  * 永无BUG
  * 
@@ -358,7 +358,7 @@ public static partial class PatchManager
         var states = hud.playerStates;
         foreach (var state in states) state.gameObject.SetActive(false);
         yield return null;
-        var victimState = states.FirstOrDefault(s => s.PlayerId == victim.PlayerId);
+        var victimState = states.FirstOrDefault(s => s.TargetPlayerId == victim.PlayerId);
         if (victimState != null) victimState.gameObject.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         victim.MurderPlayer(victim, PlayerStates.Dead, null, KillParameter.NormalKill);
@@ -555,7 +555,7 @@ public static partial class PatchManager
         IEnumerator CoCloseOnResult()
         {
             if (MeetingHud.Instance)
-                while (MeetingHud.Instance.state != MeetingHud.MeetingStates.Results) yield return null;
+                while (MeetingHud.Instance.CurrentState != MeetingHud.VoteStates.Results) yield return null;
             else
                 while (!MeetingHud.Instance) yield return null;
             window.CloseScreen();
