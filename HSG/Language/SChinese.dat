@@ -1,6 +1,7 @@
 #游戏模式
 
 "gamemode.hsg.cowboyDuel" : "赏金之争"
+"gamemode.hsg.propHunt" : "道具躲猫猫"
 
 #任务
 "task.hsg.cowboyDuel.name" : "组装枪械"
@@ -10,6 +11,42 @@
 "task.hsg.cowboyDuel.ready" : "枪械组装完成"
 "task.hsg.cowboyDuel.aim" : "举枪"
 "task.hsg.cowboyDuel.shoot" : "射击"
+
+"hsg.propHunt.task.hider" : "你的目标是隐藏到最后"
+"hsg.propHunt.task.seeker" : "你的目标是抓住所有躲藏者"
+"hsg.propHunt.task.dead" : "你已经死了，现在去爽快的隔岸观火吧"
+
+# HUD
+"hsg.propHunt.hud.hiding" : "躲藏中"
+"hsg.propHunt.hud.remaining" : "剩余"
+"hsg.propHunt.hud.final" : "最终倒计时"
+"hsg.propHunt.noMeeting" : "本模式没有会议"
+"hsg.propHunt.hud.danger" : "危险"
+
+"options.hsg.propHunt.holder.title" : "道具躲猫猫"
+"options.hsg.propHunt.holder.detail" : "躲藏者变成道具藏起来，抓捕者要在时间耗尽前把他们全部找出。<br><b>R</b> 变身　<b>Shift</b> + 方向键 微调　<b>C</b> 变回"
+
+"options.hsg.propHunt.enable" : "启用道具机制"
+"options.hsg.propHunt.seekerCount" : "抓捕者人数"
+"options.hsg.propHunt.hidingTime" : "躲藏时间"
+"options.hsg.propHunt.escapeTime" : "追捕时间"
+"options.hsg.propHunt.finalCountdownTime" : "最终倒计时"
+"options.hsg.propHunt.killCooldown" : "抓捕冷却"
+"options.hsg.propHunt.dangerMeter" : "危险程度提示"
+"options.hsg.propHunt.dangerAlertDistance" : "危险程度：告警距离"
+"options.hsg.propHunt.dangerWarnDistance" : "危险程度：警戒距离"
+"options.hsg.propHunt.missPenalty" : "击空惩罚"
+"options.hsg.propHunt.missKillCooldown" : "击空后冷却"
+"options.hsg.propHunt.destroyPropOnMiss" : "击空销毁道具"
+"options.hsg.propHunt.missDestroyRadiusBonus" : "击空销毁额外半径"
+"options.hsg.propHunt.infection" : "感染模式"
+"options.hsg.propHunt.seekerPings" : "最终阶段位置播报"
+"options.hsg.propHunt.seekerFinalMap" : "最终阶段位置箭头"
+"options.hsg.propHunt.seekerLightMod" : "抓捕者视野倍率"
+"options.hsg.propHunt.propMoveSpeed" : "道具微调速度"
+"options.hsg.propHunt.maxPropDistance" : "道具最大偏移"
+"options.hsg.propHunt.propSearchRadius" : "变身搜索半径"
+
 
 #船员
 
@@ -522,6 +559,8 @@
 "teams.taoist" : "道士"
 "taoistWin" : "道士胜利"
 "taoistExtraWin" : "+ 道士"
+"end.hsg.propHunt.seekerWin" : "抓捕者胜利"
+"end.hsg.propHunt.propWin" : "道具胜利"
 
 #设置
 "exit0": "<color=#FFFFFF>退出中</color>"

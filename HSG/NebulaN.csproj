@@ -16,6 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scripts\Core\API\**" />
+    <EmbeddedResource Remove="Scripts\Core\API\**" />
+    <None Remove="Scripts\Core\API\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
   </ItemGroup>
@@ -29,9 +35,6 @@
 			</Reference>
 		</ItemGroup>
 	</Target>
-	<ItemGroup>
-	  <Folder Include="Scripts\Core\API\CustomTask\" />
-	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
