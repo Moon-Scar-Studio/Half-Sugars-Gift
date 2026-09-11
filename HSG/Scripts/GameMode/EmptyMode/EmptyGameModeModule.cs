@@ -9,7 +9,7 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
     public const string MissionBackground = "GameMode/Mission_bg.jpg";
     public const string BulletResource = "GameMode/ZiDan.png";
     public const string MagazineResource = "GameMode/DanXia.png";
-    public const string GunResource = "GameMode/Gun.jpg";
+    public const string GunResource = "GameMode/Gun.png";
     public const string GunSceneResource = "GameMode/Gun_Scene.png";
 
     // 大厅桌面固定坐标，模式开始时由运行时同步到本地玩家。

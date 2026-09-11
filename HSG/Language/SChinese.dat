@@ -561,6 +561,7 @@
 "taoistExtraWin" : "+ 道士"
 "end.hsg.propHunt.seekerWin" : "抓捕者胜利"
 "end.hsg.propHunt.propWin" : "道具胜利"
+"end.hsg.cowboyDuel.win" : "赏金之争胜利"
 
 #设置
 "exit0": "<color=#FFFFFF>退出中</color>"
