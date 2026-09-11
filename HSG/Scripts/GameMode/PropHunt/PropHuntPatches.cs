@@ -54,11 +54,11 @@ public static class PropHuntHarmony
             prefix: typeof(PropHuntTaskDisplay).GetMethod(nameof(PropHuntTaskDisplay.SetTasksPrefix)),
             prefixPriority: Priority.First);
 
-        // 任务栏文案。Nebula 自己的 TaskTextPatch 是默认优先级，
-        // 用 Priority.Last 保证我们在它之后写，结果不会被它的事件结果覆盖。
+        // 任务栏文案。Harmony 的 postfix 高优先级后执行：Priority.First 保证
+        // 在 Nebula 自己的 TaskTextPatch（默认优先级）之后写入，不被它覆盖。
         Patch(harmony, typeof(TaskPanelBehaviour), nameof(TaskPanelBehaviour.SetTaskText),
             postfix: typeof(PropHuntTaskDisplay).GetMethod(nameof(PropHuntTaskDisplay.SetTaskTextPostfix)),
-            postfixPriority: Priority.Last);
+            postfixPriority: Priority.First);
 
         HsgDebug.Log("[HSG] 道具躲猫猫补丁应用完成。");
     }
@@ -262,7 +262,7 @@ public class PropHuntMeetingBlocker : AbstractModule<Virial.Game.Game>, IGameOpe
         preprocessor.DIManager.RegisterModule<Virial.Game.Game>(() => new PropHuntMeetingBlocker());
     }
 
-    protected new void OnInjected(Virial.Game.Game container) => this.Register(container);
+    protected override void OnInjected(Virial.Game.Game container) => this.Register(container);
 
     void OnCheckEmergency(CheckCanPushEmergencyButtonEvent ev)
     {

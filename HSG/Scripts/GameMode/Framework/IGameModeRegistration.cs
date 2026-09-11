@@ -1,6 +1,4 @@
-using System.Collections;
 using Virial.Game;
-using Virial.Text;
 
 namespace hvtXsvc.GameMode.Framework;
 
@@ -17,24 +15,6 @@ public interface IGameModeRegistration
 
     /// <summary>创建房间时允许的最小玩家数。</summary>
     int MinPlayers { get; }
-}
-
-/// <summary>
-/// 模式模块类型提供者：返回能被 Nebula 容器识别的模块类型。
-/// </summary>
-public interface IGameModeModuleProvider
-{
-    /// <summary>Nebula 可实例化的模块类型（通常指向 Nebula 已注册的 IGameModeStandard 等）。</summary>
-    Type ModuleType { get; }
-}
-
-/// <summary>
-/// 分配器工厂：每次游戏开局时创建角色分配器。
-/// </summary>
-public interface IGameModeAllocatorFactory
-{
-    /// <summary>创建角色分配器实例。</summary>
-    IRoleAllocator CreateAllocator();
 }
 
 /// <summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Virial.Configuration;
@@ -18,7 +18,7 @@ public class RandomEventSettings : AbstractModule<Game>, IGameOperator
     public static bool NeedCheck = false;
     private float timer;
     
-    protected new void OnInjected(Game container) => this.Register(container);
+    protected override void OnInjected(Game container) => this.Register(container);
 
     public static BoolConfiguration EnableRandomEventsSettings =
         NebulaAPI.Configurations.Configuration(

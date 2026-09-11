@@ -56,14 +56,17 @@ public static class PropHuntInput
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            // 阻断本体移动
-            __instance.del = Vector2.zero;
-
+            // 只有配合方向键才算微调道具：防止输入法的 Shift（中英切换）把本体移动误锁死
             var direction = Vector2.zero;
             if (KeyboardJoystick.player.GetButton(ActionRight)) direction.x += 1f;
             if (KeyboardJoystick.player.GetButton(ActionLeft)) direction.x -= 1f;
             if (KeyboardJoystick.player.GetButton(ActionUp)) direction.y += 1f;
             if (KeyboardJoystick.player.GetButton(ActionDown)) direction.y -= 1f;
+
+            if (direction == Vector2.zero) return true;
+
+            // 阻断本体移动
+            __instance.del = Vector2.zero;
 
             float speed = PropHuntSettings.PropMoveSpeed.GetValue();
             var current = renderer.transform.localPosition;

@@ -51,8 +51,8 @@ public static class PropHuntTaskDisplay
     }
 
     /// <summary>
-    /// TaskPanelBehaviour.SetTaskText 的后缀，以 Priority.Last 应用。
-    /// Nebula 自己的 TaskTextPatch 是默认优先级（Normal），所以我们一定在它之后覆盖。
+    /// TaskPanelBehaviour.SetTaskText 的后缀，以 Priority.First 应用。
+    /// Harmony 的 postfix 高优先级后执行，因此我们写在 Nebula 的 TaskTextPatch（默认优先级）之后。
     /// </summary>
     public static void SetTaskTextPostfix(TaskPanelBehaviour __instance)
     {

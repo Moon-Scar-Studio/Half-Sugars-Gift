@@ -46,6 +46,8 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
         if (!AmongUsClient.Instance.AmHost) return;
         var alive = GamePlayer.AllPlayers.Where(p => !p.IsDead).ToList();
         if (alive.Count != 1) return;
+        // 射杀胜利路径已结算过则不再重复广播
+        if (!CowboyDuelState.TryMarkGameEnded()) return;
 
         var winners = BitMasks.AsPlayer();
         winners.Add(alive[0]);
@@ -110,6 +112,8 @@ public sealed class CowboyDuelGameModeModule : GameModeModuleBase
             CowboyDuelRpc.RequestShot.Invoke((shooter.PlayerId, target.PlayerId));
             return true;
         }
+        // 先占结算标志再击杀：MurderPlayer 会同步触发 CheckLastPlayer，避免同一帧双发胜利 RPC
+        if (!CowboyDuelState.TryMarkGameEnded()) return false;
         shooter.MurderPlayer(target, PlayerState.Sniped, EventDetail.Kill, KillParameter.RemoteKill);
         var winners = BitMasks.AsPlayer();
         winners.Add(shooter);
@@ -155,11 +159,21 @@ public static class CowboyDuelState
 {
     private static readonly Dictionary<byte, CowboyDuelAssemblyStep> Assembly = new();
     private static readonly HashSet<byte> ReadyPlayers = new();
+    private static bool gameEnded;
 
     public static void Reset()
     {
         Assembly.Clear();
         ReadyPlayers.Clear();
+        gameEnded = false;
+    }
+
+    /// <summary>占位结算标志：第一次占位成功返回 true，此后返回 false，防止胜利 RPC 同帧双发。</summary>
+    public static bool TryMarkGameEnded()
+    {
+        if (gameEnded) return false;
+        gameEnded = true;
+        return true;
     }
 
     public static bool AdvanceAssembly(byte playerId, CowboyDuelAssemblyStep step)

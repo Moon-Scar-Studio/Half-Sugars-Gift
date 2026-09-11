@@ -48,6 +48,8 @@ public class PropHuntRoleAllocator : IRoleAllocator
 {
     public void Assign(List<byte> impostors, List<byte> others)
     {
+        // 分配是否被调用的直接证据：若日志缺失，说明模式识别或注册环节出了问题
+        HsgDebug.Log($"[HSG] 道具躲猫猫分配开始：内鬼候选 {impostors.Count} 人，其余 {others.Count} 人。");
         var table = new RoleTable();
 
         var all = new List<byte>(impostors);
@@ -82,8 +84,6 @@ public class PropHuntRoleAllocator : IRoleAllocator
                     ? Nebula.Roles.Impostor.Impostor.MyRole
                     : Nebula.Roles.Crewmate.Crewmate.MyRole);
         }
-
-        PropHuntState.SetSeekersOnAssign(seekers);
 
         table.Determine();
     }
@@ -136,7 +136,9 @@ public static class PropHuntGameModeRegistration
             //    再来一次会让带特性的补丁被应用两遍。详见 PropHuntHarmony 的注释。
             PropHuntHarmony.Apply(new Harmony("HSG.PropHunt"));
 
-            HsgDebug.Log($"[HSG] 道具躲猫猫模式注册成功，当前模式总数：{GameModes.AllGameModes.Count()}");
+            // 打印本模式在列表中的索引：模式选择按索引同步，索引因机器上 addon 集合不同而漂移
+            var modes = GameModes.AllGameModes.ToList();
+            HsgDebug.Log($"[HSG] 道具躲猫猫模式注册成功，索引 {modes.IndexOf(Definition)}，模式总数：{modes.Count}");
         }
         catch (Exception exception)
         {

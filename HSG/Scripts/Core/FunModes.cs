@@ -1,4 +1,4 @@
-﻿
+
 namespace HalfSugarGift.Core.Patch;
 
 [NebulaPreprocess(PreprocessPhase.PostLoadAddons)]
@@ -11,7 +11,7 @@ public class FunModes: AbstractModule<Game>, IGameOperator
         preprocessor.DIManager.RegisterModule<Game>(() => new FunModes());
     }
 
-    protected new void OnInjected(Game container) => this.Register(container);
+    protected override void OnInjected(Game container) => this.Register(container);
 
     // 三分钟鼎力巨作
     public static BoolConfiguration EnableMiniMode = NebulaAPI.Configurations.Configuration(

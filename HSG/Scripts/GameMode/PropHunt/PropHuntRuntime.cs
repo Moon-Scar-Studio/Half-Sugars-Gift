@@ -32,19 +32,10 @@ public static class PropHuntState
     /// <summary>当前阶段的剩余秒数。</summary>
     public static float Remaining { get; private set; }
 
-    /// <summary>开局时由分配器记录下来的抓捕者名单，用于开局演出。</summary>
-    private static readonly HashSet<byte> InitialSeekers = new();
-
     /// <summary>是否处于最终倒计时。</summary>
     public static bool IsFinalCountdown =>
         Phase == PropHuntPhase.Hunting &&
         Remaining <= PropHuntSettings.FinalCountdownTime.GetValue();
-
-    internal static void SetSeekersOnAssign(IEnumerable<byte> seekers)
-    {
-        InitialSeekers.Clear();
-        foreach (var id in seekers) InitialSeekers.Add(id);
-    }
 
     internal static void Reset()
     {
@@ -76,9 +67,22 @@ public static class PropHuntState
     public static readonly RemoteProcess<(byte phase, float remaining)> RpcSync =
         new("HSG_PropHuntSync", (message, _) =>
         {
+            var previous = Phase;
             Phase = (PropHuntPhase)message.phase;
             Remaining = message.remaining;
+
+            // 进入追捕阶段：各端给本地抓捕者设置配置冷却（SetCooldown 只影响本机按钮）
+            if (previous == PropHuntPhase.Hiding && Phase == PropHuntPhase.Hunting)
+                SetLocalSeekerCooldown();
         });
+
+    /// <summary>本地玩家是抓捕者时，把击杀冷却设为模式配置值（原型：Snatcher.RewindKillCooldown）。</summary>
+    internal static void SetLocalSeekerCooldown()
+    {
+        var local = GamePlayer.LocalPlayer;
+        if (local == null || !local.IsImpostor) return;
+        NebulaAPI.CurrentGame?.KillButtonLikeHandler.SetCooldown(PropHuntSettings.SeekerKillCooldown.GetValue());
+    }
 }
 
 /// <summary>
@@ -98,7 +102,7 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         preprocessor.DIManager.RegisterModule<Virial.Game.Game>(() => new PropHuntRuntime());
     }
 
-    protected new void OnInjected(Virial.Game.Game container) => this.Register(container);
+    protected override void OnInjected(Virial.Game.Game container) => this.Register(container);
 
     private float syncAccumulator;
     private float pingAccumulator;
@@ -152,10 +156,8 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         float hidingTime = PropHuntSettings.HidingTime.GetValue();
         if (hidingTime <= 0f) return;
 
-        var local = GamePlayer.LocalPlayer;
-        if (local == null || !local.IsImpostor) return;
-
-        // 速度归零由房主下发，保证所有端一致。
+        // 速度归零由房主下发（GainSpeedAttribute 内部走 RPC，按玩家精确生效，各端同步）。
+        // 注意：这里不能以"本地玩家是否抓捕者"为前提提前返回，否则房主是道具方时抓捕者会漏冻。
         if (AmongUsClient.Instance.AmHost)
         {
             foreach (var player in GamePlayer.AllPlayers.Where(p => p.IsImpostor))
@@ -164,7 +166,10 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             }
         }
 
-        PatchManager.ShowScreenOverlay(new Color(0f, 0f, 0f, 1f), hidingTime);
+        // 全屏遮挡只给本地抓捕者看。
+        var local = GamePlayer.LocalPlayer;
+        if (local != null && local.IsImpostor)
+            PatchManager.ShowScreenOverlay(new Color(0f, 0f, 0f, 1f), hidingTime);
     }
 
     /// <summary>应用抓捕者视野倍率（对应原版预设的 ImpostorLightMod）。</summary>
@@ -241,7 +246,6 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             {
                 case PropHuntPhase.Hiding:
                     PropHuntState.HostSet(PropHuntPhase.Hunting, PropHuntSettings.EscapeTime.GetValue());
-                    ResetSeekerCooldown();
                     return;
 
                 case PropHuntPhase.Hunting:
@@ -269,13 +273,6 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
 
     private static bool IsAliveProp(GamePlayer player)
         => player != null && !player.IsDead && !player.IsDisconnected && !player.IsImpostor;
-
-    private static void ResetSeekerCooldown()
-    {
-        var local = GamePlayer.LocalPlayer;
-        if (local == null || !local.IsImpostor) return;
-        NebulaAPI.CurrentGame?.KillButtonLikeHandler.SetCooldown(PropHuntSettings.SeekerKillCooldown.GetValue());
-    }
 
     #endregion
 

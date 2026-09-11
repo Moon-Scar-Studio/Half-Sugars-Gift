@@ -555,7 +555,7 @@ public static partial class PatchManager
         IEnumerator CoCloseOnResult()
         {
             if (MeetingHud.Instance)
-                while (MeetingHud.Instance.CurrentState != MeetingHud.MeetingStates.Results) yield return null;
+                while (MeetingHud.Instance.state != MeetingHud.MeetingStates.Results) yield return null;
             else
                 while (!MeetingHud.Instance) yield return null;
             window.CloseScreen();
