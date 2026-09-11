@@ -18,7 +18,7 @@ public class RandomEventSettings : AbstractModule<Game>, IGameOperator
     public static bool NeedCheck = false;
     private float timer;
     
-    protected override void OnInjected(Game container) => this.Register(container);
+    protected new void OnInjected(Game container) => this.Register(container);
 
     public static BoolConfiguration EnableRandomEventsSettings =
         NebulaAPI.Configurations.Configuration(
