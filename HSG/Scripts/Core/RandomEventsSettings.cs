@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Virial.Configuration;
@@ -91,42 +91,45 @@ public class RandomEventSettings : AbstractModule<Game>, IGameOperator
             (0, 100),
             0
         );
-    void OnUpdate(UpdateEvent ev)
+    // 随机事件只能由房主掷骰并执行：MurderPlayer / MovePlayer / GainAttribute 内部都会广播 RPC，
+    // 如果每个客户端各自执行，N 个玩家就会产生 N 次随机杀人和 N² 次属性 RPC。
+    // 视觉反馈通过 PatchManager.RpcShowOverlayAll 广播给所有人。
+    [OnlyHost]
+    void OnUpdate(GameUpdateEvent ev)
     {
         if (!EnableRandomEventsSettings || !NeedCheck)
             return;
+        if (MeetingHud.Instance != null || ExileController.Instance != null)
+            return;
 
         timer -= ev.DeltaTime;
-
         if (timer > 0)
             return;
 
         timer = CheckTime();
         DoActionForRES();
     }
-    [Local]
+
     void StartUpdate(GameStartEvent ev)
     {
         NeedCheck = true;
         timer = CheckTime();
     }
 
-
-    [Local]
     void CloseUpdate(GameEndEvent ev)
     {
         NeedCheck = false;
     }
 
+    static void OverlayAll(float duration, bool pulse, int pulseCount)
+        => PatchManager.RpcShowOverlayAll.Invoke(("#FFFFFF", duration, pulse, pulseCount));
 
     float CheckTime()
     {
         if (EnableChangeRandomTime)
             return RandomTime;
-
         return UnityEngine.Random.Range(15f, 600f);
     }
-
 
     void DoActionForRES()
     {
@@ -138,76 +141,47 @@ public class RandomEventSettings : AbstractModule<Game>, IGameOperator
             StoneWeight +
             PartyWeight +
             GetKeyWeight;
-        if (totalWeight <= 0)
-        {
-            PatchManager.ShowScreenOverlay(UnityEngine.Color.white, -1f, true, 3);
-            return;
-        }
-        int index = UnityEngine.Random.Range(0, totalWeight);
-        if ((index -= MeetingWeight) < 0)
-        {
-            DoMeeting();
-            return;
-        }
-        if ((index -= KillWeight) < 0)
-        {
-            DoKill();
-            return;
-        }
-        if ((index -= SwapWeight) < 0)
-        {
-            DoSwap();
-            return;
-        }
-        if ((index -= FogWeight) < 0)
-        {
-            DoFog();
-            return;
-        }
-        if ((index -= StoneWeight) < 0)
-        {
-            DoStone();
-            return;
-        }
-        if ((index -= PartyWeight) < 0)
-        {
-            return;
-        }
-        if ((index -= GetKeyWeight) < 0)
-        {
 
-            return;
-        }
+        if (totalWeight <= 0) return; // 所有权重为 0：什么都不发生
+
+        int index = UnityEngine.Random.Range(0, totalWeight);
+
+        if ((index -= MeetingWeight) < 0) { DoMeeting(); return; }
+        if ((index -= KillWeight) < 0) { DoKill(); return; }
+        if ((index -= SwapWeight) < 0) { DoSwap(); return; }
+        if ((index -= FogWeight) < 0) { DoFog(); return; }
+        if ((index -= StoneWeight) < 0) { DoStone(); return; }
+        if ((index -= PartyWeight) < 0) { DoParty(); return; }
+        if ((index -= GetKeyWeight) < 0) { DoGetKey(); return; }
     }
+
+    static List<GamePlayer> AlivePlayers()
+        => GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
+
     void DoMeeting()
     {
-        var players = GamePlayer.AllPlayers
-            .Where(p => !p.IsDead && !p.IsDisconnected)
-            .ToList();
-
-        if (players.Count == 0)
-            return;
-
+        var players = AlivePlayers();
+        if (players.Count == 0) return;
         var target = players[UnityEngine.Random.Range(0, players.Count)];
-
         target.RequestEmergencyMeeting(true, false);
-
-        PatchManager.ShowScreenOverlay(UnityEngine.Color.white, 3f, true, 2);
+        OverlayAll(3f, true, 2);
     }
+
     void DoKill()
     {
-        var players = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
-
-        if (players.Count < 2)return;
+        var players = AlivePlayers();
+        if (players.Count < 2) return;
         var killer = players[UnityEngine.Random.Range(0, players.Count)];
         var victims = players.Where(p => p != killer).ToList();
         var victim = victims[UnityEngine.Random.Range(0, victims.Count)];
-        killer.MurderPlayer(victim,PlayerStates.Dead,null,KillParameter.NormalKill);
-        PatchManager.ShowScreenOverlay(UnityEngine.Color.white, 3f, true, 2);
+        killer.MurderPlayer(victim, PlayerStates.Dead, EventDetail.Kill, KillParameter.NormalKill);
+        OverlayAll(3f, true, 2);
     }
+
     void DoSwap()
     {
-        var players = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).Take(3).ToList();
+        // 随机挑 3 人轮换位置（原来 Take(3) 固定取前三名玩家）
+        var players = AlivePlayers().OrderBy(_ => UnityEngine.Random.value).Take(3).ToList();
         if (players.Count < 3) return;
         var pos1 = players[0].TruePosition;
         var pos2 = players[1].TruePosition;
@@ -215,20 +189,44 @@ public class RandomEventSettings : AbstractModule<Game>, IGameOperator
         PatchManager.MovePlayer(players[0], pos2);
         PatchManager.MovePlayer(players[1], pos3);
         PatchManager.MovePlayer(players[2], pos1);
-        PatchManager.ShowScreenOverlay(UnityEngine.Color.white, 3f, true, 2);
+        OverlayAll(3f, true, 2);
     }
+
     void DoFog()
     {
-        PatchManager.ShowScreenOverlay(UnityEngine.Color.white, -1f, true, 3);
+        // 原实现显示 duration=-1 的永久白色遮罩且从不移除；改为限时浓雾 + 视野缩减
+        OverlayAll(20f, true, 6);
+        foreach (var p in AlivePlayers())
+            p.GainAttribute(PlayerAttributes.Eyesight, 20f, 0.5f, false, 50, "HSG.RES.Fog");
     }
+
     void DoStone()
     {
-        var players = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
-        HostSendRpc.SetSizeY(players, 0.5f);
-        foreach (var p in players)
+        foreach (var p in AlivePlayers())
         {
-            p.GainSpeedAttribute(0.75f,120f,true, 50,"RES_stone");
+            // GainSizeAttribute 自带 RPC 广播，不需要绕道 HostSendRpc
+            p.GainSizeAttribute(new Virial.Compat.Vector2(1f, 0.5f), 120f, true, 50, "HSG.RES.StoneSize");
+            p.GainSpeedAttribute(0.75f, 120f, true, 50, "HSG.RES.StoneSpeed");
         }
-        PatchManager.ShowScreenOverlay(UnityEngine.Color.white, 3f, true, 2);
+        OverlayAll(3f, true, 2);
+    }
+
+    void DoParty()
+    {
+        // 派对：所有人短暂加速
+        foreach (var p in AlivePlayers())
+            p.GainSpeedAttribute(1.5f, 30f, false, 50, "HSG.RES.Party");
+        OverlayAll(3f, true, 2);
+    }
+
+    void DoGetKey()
+    {
+        // 随机一名存活玩家获得钥匙大师修饰符
+        var players = AlivePlayers();
+        if (players.Count == 0) return;
+        var target = players[UnityEngine.Random.Range(0, players.Count)];
+        if (!target.TryGetModifier<NebulaN.Roles.Modifier.KeyMaster.Instance>(out _))
+            target.AddModifier(NebulaN.Roles.Modifier.KeyMaster.MyRole);
+        OverlayAll(3f, true, 2);
     }
 }

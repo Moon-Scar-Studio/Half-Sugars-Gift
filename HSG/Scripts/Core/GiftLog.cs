@@ -41,16 +41,25 @@ public static class HsgDebug
         string logLine = $"[{DateTime.Now:yyyy/M/d HH:mm:ss}]: \"{message}\"";
         AppendLog(logLine);
     }
-    public static void LogError(string? message = "undefined", string reason= "undefined")
+    /// <summary>
+    /// 记录错误。只写日志，不抛异常：调用方大多在 catch 块里，抛出会把已经捕获的异常重新扔回去，
+    /// 让本应"记录后继续"的容错逻辑（补丁跳过、静态构造函数、Harmony postfix）直接中断。
+    /// 需要中断流程的地方请显式 throw。
+    /// </summary>
+    public static void LogError(string? message = "undefined", string reason = "undefined")
     {
         if (message == null)
         {
             message = "日志值为null";
         }
-        string logLine = $"[Error-{DateTime.Now:yyyy/M/d HH:mm:ss}]: \"{message}\"";
+        string logLine = reason == "undefined"
+            ? $"[Error-{DateTime.Now:yyyy/M/d HH:mm:ss}]: \"{message}\""
+            : $"[Error-{DateTime.Now:yyyy/M/d HH:mm:ss}]: \"{message}\" (reason: {reason})";
         AppendLog(logLine);
-        throw new Exception($"Error. msg:{message},reason:{reason}");
     }
+    /// <summary>记录异常（含堆栈）。</summary>
+    public static void LogException(string? message, Exception exception)
+        => LogError($"{message ?? "undefined"} :: {exception}");
     public static void LogWarning(string? message = "undefined")
     {
         if (message == null)

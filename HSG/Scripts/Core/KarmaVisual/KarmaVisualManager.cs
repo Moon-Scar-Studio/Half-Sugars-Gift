@@ -57,10 +57,22 @@ public static class KarmaVisualManager
         return result.ToArray();
     }
 }
+/// <summary>
+/// 自定义 MonoBehaviour 在 IL2CPP 下必须先 RegisterTypeInIl2Cpp 并提供 IntPtr 构造函数，
+/// 否则 AddComponent 会在运行时失败（参考 CowboyDuelMinigame 的写法）。
+/// 注意：Resources/KarmaVisual/*.png 目前并不存在，LoadFrames 会返回空数组并静默跳过，补上素材后此效果才会显示。
+/// </summary>
 public class KarmaVisualAnimator : MonoBehaviour
 {
+    static KarmaVisualAnimator() => Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<KarmaVisualAnimator>();
+    public KarmaVisualAnimator(IntPtr ptr) : base(ptr) { }
+    public KarmaVisualAnimator() : base(Il2CppInterop.Runtime.Injection.ClassInjector.DerivedConstructorPointer<KarmaVisualAnimator>())
+    {
+        Il2CppInterop.Runtime.Injection.ClassInjector.DerivedConstructorBody(this);
+    }
+
     private GamePlayer target;
-    private SpriteRenderer renderer;
+    private SpriteRenderer spriteRenderer;
     private Sprite[] frames;
     private float timer;
     private int frame;
@@ -70,7 +82,7 @@ public class KarmaVisualAnimator : MonoBehaviour
     public void Init(GamePlayer target, SpriteRenderer renderer, Sprite[] frames)
     {
         this.target = target;
-        this.renderer = renderer;
+        this.spriteRenderer = renderer;
         this.frames = frames;
         renderer.sprite = frames[0];
         floatOffset = UnityEngine.Random.Range(0f, 10f);
@@ -88,8 +100,8 @@ public class KarmaVisualAnimator : MonoBehaviour
             timer = 0;
             frame++;
             if (frame >= frames.Length) frame = 0;
-            renderer.sprite = frames[frame];
+            spriteRenderer.sprite = frames[frame];
         }
-        renderer.color = new Color(1f, 1f, 1f, 0.75f + Mathf.Sin(Time.time * 2f) * 0.15f);
+        spriteRenderer.color = new Color(1f, 1f, 1f, 0.75f + Mathf.Sin(Time.time * 2f) * 0.15f);
     }
 }

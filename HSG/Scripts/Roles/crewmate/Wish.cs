@@ -65,7 +65,7 @@ public class Wish : DefinedRoleTemplate, HasCitation, DefinedRole,
         );
     }
     static RemoteProcess<byte> RpcPlayReviveFlash = new(
-    "Wishlight",
+    "HSG.Wish.ReviveFlash",
     (targetId, _) => {
         if (PlayerControl.LocalPlayer.PlayerId == targetId)
             AmongUsUtil.PlayQuickFlash(new Virial.Color(1f,0.9f,0.6f,0.5f));
@@ -174,14 +174,6 @@ public class Wish : DefinedRoleTemplate, HasCitation, DefinedRole,
                 RpcPlayReviveFlash.Invoke(MarkedPlayer.PlayerId);
                 MarkedPlayer = null;
             }
-        }
-        public bool OnExiledPost(byte[] voters, byte exiledPlayerId)
-        {
-            if (exiledPlayerId == MarkedPlayer.PlayerId)
-            {
-                return false;
-            }
-            return true;
         }
         [Local]
         private void DecorateMarkedPlayerName(PlayerDecorateNameEvent ev)

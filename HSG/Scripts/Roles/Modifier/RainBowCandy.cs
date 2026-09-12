@@ -30,7 +30,10 @@ public class RainbowCandy :
     public class Instance : RuntimeAssignableTemplate, RuntimeModifier
     {
         private Coroutine? _colorRoutine;
-        private static readonly List<int> _colorIds = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+        private bool _running;
+        private const string OutfitTag = "HSG.RainBowCandy";
+        // Palette.PlayerColors 的实际数量随游戏版本变化，运行时读取而不是写死 0~18
+        private static int ColorCount => Palette.PlayerColors?.Length ?? 18;
 
         public Instance(GamePlayer player) : base(player) { }
 
@@ -39,35 +42,33 @@ public class RainbowCandy :
         void RuntimeAssignable.OnActivated()
         {
             if (!AmOwner) return;
+            _running = true;
             _colorRoutine = NebulaManager.Instance.StartCoroutine(ColorLoop().WrapToIl2Cpp());
         }
 
         private IEnumerator ColorLoop()
         {
-            while (!MyPlayer.IsDead)
+            while (_running && !MyPlayer.IsDead)
             {
-                int randomColorId = _colorIds[UnityEngine.Random.Range(0, _colorIds.Count)];
-                PlayerControl pc = null;
-                foreach (var p in PlayerControl.AllPlayerControls)
-                {
-                    if (p.PlayerId == MyPlayer.PlayerId)
-                    {
-                        pc = p;
-                        break;
-                    }
-                }
-                if (pc != null)  HostSendRpc.SetColor(MyPlayer, (byte)randomColorId);
+                int randomColorId = UnityEngine.Random.Range(0, ColorCount);
+                // 通过 Nebula 的 Outfit 系统改颜色（AddOutfit 自带全网同步），
+                // 原实现依赖 HostSendRpc.SetColor —— 那段代码因嵌套 Register 从未真正改过颜色。
+                var outfit = new OutfitDefinition(MyPlayer.DefaultOutfit, true, overriddenColor: randomColorId);
+                MyPlayer.AddOutfit(new OutfitCandidate(outfit, OutfitTag, OutfitPriority.Paint, true));
                 yield return new WaitForSeconds(changeInterval);
             }
+            if (AmOwner) MyPlayer.RemoveOutfitByTag(OutfitTag);
         }
 
         void IGameOperator.OnReleased()
         {
+            _running = false;
             if (_colorRoutine != null)
             {
                 NebulaManager.Instance.StopCoroutine(_colorRoutine);
                 _colorRoutine = null;
             }
+            if (AmOwner) MyPlayer.RemoveOutfitByTag(OutfitTag);
         }
         void RuntimeAssignable.DecorateNameConstantly(ref string name, bool canSeeAllInfo, bool inEndScene)
         {

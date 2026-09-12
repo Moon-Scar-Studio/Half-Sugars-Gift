@@ -49,11 +49,11 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
         public DefinedRole Role => MyRole;
         public Instance(GamePlayer player) : base(player) { }
         ModAbilityButton? Btn;
-        static public bool CanKill = false;
-        private bool _isAlive = true;
+        /// <summary>是否已获得击杀能力（有非船员阵营被潜行者拦下时获得）。由房主判定后通过 RPC 同步。</summary>
+        bool CanKill = false;
+
         void RuntimeAssignable.OnActivated()
         {
-            ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
             if (!AmOwner) return;
             var playerTracker = NebulaAPI.Modules.PlayerTracker(this, MyPlayer);
             playerTracker.SetColor(Cor.impRed);
@@ -64,7 +64,7 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
                 Cooldown,
                 "lurker.kill",
                 null,
-                _ => !MyPlayer.IsDead && CanKill,
+                _ => !MyPlayer.IsDead && CanKill && playerTracker.CurrentTarget != null,
                 _ => !MyPlayer.IsDead && CanKillConfig,
                 false
             );
@@ -77,48 +77,39 @@ public class Lurker : DefinedRoleTemplate, HasCitation, DefinedRole,
                 }
                 button.StartCoolDown();
             };
-            GameOperatorManager.Instance?.Subscribe<EndCriteriaPreMetEvent>(OnEndCriteriaPreMet, this);
         }
+
+        /// <summary>
+        /// 拦截非船员阵营的胜利。只要潜行者还活着（用 MyPlayer.IsDead 判断——
+        /// 原实现用 PlayerDieEvent 维护的 _isAlive，而放逐不会触发 PlayerDieEvent，
+        /// 导致潜行者被投出后仍然永久拦截，游戏无法结束）。
+        /// </summary>
         [OnlyHost]
-        private void OnEndCriteriaPreMet(EndCriteriaPreMetEvent ev)
+        void OnEndCriteriaPreMet(EndCriteriaPreMetEvent ev)
         {
-            if (!_isAlive) return;
+            if (MyPlayer.IsDead) return;
             var crewmateEnd = NebulaGameEnds.CrewmateGameEnd.Get();
             if (ev.GameEnd == crewmateEnd) return;
             ev.Reject();
+            // 有阵营本该胜利却被拦下：潜行者获得击杀能力
+            if (CanKillConfig && !CanKill) RpcSetCanKill.Invoke(MyPlayer.PlayerId);
         }
-        static public RemoteProcess RpcSetBool = new("SetBool_H", _ =>
+
+        static readonly RemoteProcess<byte> RpcSetCanKill = new("HSG.Lurker.SetCanKill", (playerId, _) =>
         {
-            CanKill = true;
+            if (GamePlayer.GetPlayer(playerId)?.Role is Instance inst)
+            {
+                inst.CanKill = true;
+                if (inst.AmOwner) AmongUsUtil.PlayQuickFlash(Cor.LurkerCor);
+            }
         });
+
         [OnlyHost]
         void NeedWin(PlayerDieEvent ev)
         {
-            if (ev.Player == MyPlayer)
-            {
-                // 只是不想不使用参数。
-                // 不用的话IDE骚扰我让我用。
-                // 我好像可以PlayerDieEvent _
-                // 这样就不会骚扰了。
-                // 懒得整了。
-                // 不改了。
-            }
-            var AlivePlayers = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
-            int CrewCount = AlivePlayers.Count(p => p.Role.Role.Category == RoleCategory.CrewmateRole);
-            if (AlivePlayers.Count == CrewCount) NebulaAPI.CurrentGame?.TriggerGameEnd(NebulaGameEnds.CrewmateGameEnd, GameEndReason.Situation);
-        }
-        void EraseCanKill(GameStartEvent ev) => CanKill = false;
-        [OnlyMyPlayer]
-        void OnDie(PlayerDieEvent ev)
-        {
-            if (ev.Player == MyPlayer)
-                _isAlive = false;
-        }
-        [OnlyMyPlayer]
-        void OnGameStart(GameStartEvent ev)
-        {
-            _isAlive = true;
-            CanKill = false;
+            var alivePlayers = GamePlayer.AllPlayers.Where(p => !p.IsDead && !p.IsDisconnected).ToList();
+            int crewCount = alivePlayers.Count(p => p.Role.Role.Category == RoleCategory.CrewmateRole);
+            if (alivePlayers.Count == crewCount) NebulaAPI.CurrentGame?.TriggerGameEnd(NebulaGameEnds.CrewmateGameEnd, GameEndReason.Situation);
         }
     }
 }

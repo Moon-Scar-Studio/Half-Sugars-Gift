@@ -32,10 +32,34 @@ public static class PropHuntState
     /// <summary>当前阶段的剩余秒数。</summary>
     public static float Remaining { get; private set; }
 
+    /// <summary>开局时由分配器记录下来的抓捕者名单，用于开局演出。</summary>
+    private static readonly HashSet<byte> InitialSeekers = new();
+
     /// <summary>是否处于最终倒计时。</summary>
     public static bool IsFinalCountdown =>
         Phase == PropHuntPhase.Hunting &&
         Remaining <= PropHuntSettings.FinalCountdownTime.GetValue();
+
+    /// <summary>
+    /// 是否处于终盘加成窗口（抓捕者加速 + 冷却缩短）。
+    ///
+    /// 纯派生属性：各端用同一份 Remaining 算，不需要额外同步一个 bool。
+    /// 真正的属性下发由房主在 PropHuntRuntime.HostTick 里做。
+    /// </summary>
+    public static bool IsSeekerBoost
+    {
+        get
+        {
+            float boostTime = PropHuntSettings.SeekerBoostTime.GetValue();
+            return boostTime > 0f && Phase == PropHuntPhase.Hunting && Remaining <= boostTime;
+        }
+    }
+
+    internal static void SetSeekersOnAssign(IEnumerable<byte> seekers)
+    {
+        InitialSeekers.Clear();
+        foreach (var id in seekers) InitialSeekers.Add(id);
+    }
 
     internal static void Reset()
     {
@@ -71,7 +95,8 @@ public static class PropHuntState
             Phase = (PropHuntPhase)message.phase;
             Remaining = message.remaining;
 
-            // 进入追捕阶段：各端给本地抓捕者设置配置冷却（SetCooldown 只影响本机按钮）
+            // 进入追捕阶段：各端给本地抓捕者设置配置冷却（SetCooldown 只影响本机按钮）。
+            // 在 RpcSync 里做而不是只让房主做：非房主的抓捕者也需要重置冷却。
             if (previous == PropHuntPhase.Hiding && Phase == PropHuntPhase.Hunting)
                 SetLocalSeekerCooldown();
         });
@@ -106,6 +131,9 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
 
     private float syncAccumulator;
     private float pingAccumulator;
+
+    /// <summary>终盘加成是否已经下发过。房主侧状态，避免每帧重复广播属性。</summary>
+    private bool boostApplied;
     private readonly List<Arrow> seekerArrows = new();
     private bool arrowsBuilt;
 
@@ -118,7 +146,12 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         syncAccumulator = 0f;
         pingAccumulator = 0f;
         arrowsBuilt = false;
+        boostApplied = false;
         ClearArrows();
+
+        // 全屏演出层（黑幕 + 大号倒计时）要在读取阵营之后装配，
+        // GameStartEvent 时角色已经分配完毕，这里是最早的安全点。
+        PropHuntOverlay.Setup();
 
         SetUpHud();
         ApplySeekerVision();
@@ -130,7 +163,11 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
 
         // 躲藏者的危险程度提示条。
         var currentGame = NebulaAPI.CurrentGame;
-        if (currentGame != null) PropHuntDangerMeter.Setup(currentGame);
+        if (currentGame != null)
+        {
+            PropHuntDangerMeter.Setup(currentGame);
+            PropHuntSkills.Setup(currentGame);
+        }
 
         if (AmongUsClient.Instance.AmHost)
         {
@@ -150,11 +187,21 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         HsgDebug.Log("[HSG] 道具躲猫猫开局。");
     }
 
-    /// <summary>躲藏阶段冻结抓捕者：速度归零 + 全屏遮挡。</summary>
+    /// <summary>躲藏阶段冻结抓捕者：速度归零（全屏黑幕已交给 PropHuntOverlay）。</summary>
     private void FreezeSeekersForHiding()
     {
         float hidingTime = PropHuntSettings.HidingTime.GetValue();
         if (hidingTime <= 0f) return;
+
+        // 【修正】这里原本有一句 `if (local == null || !local.IsImpostor) return;`。
+        // 那是个真 bug：下面的冻结是房主职责，而房主自己完全可能是道具方，
+        // 一旦房主不是抓捕者就会在这里提前返回，导致所有抓捕者一帧都没被冻住，
+        // 躲藏阶段直接形同虚设。判定阵营的活交给下面的 Where 就够了。
+        //
+        // 全屏遮挡也从这里移走了。旧写法是 PatchManager.ShowScreenOverlay(黑, hidingTime)，
+        // 有两个问题：那个方法在非 pulse 分支会把 alpha 强制写成 0.5（根本不是黑屏），
+        // 而且时长是此刻一次性算死的，房主之后调整倒计时就对不上。
+        // 现在交给 PropHuntOverlay 按 Phase 每帧判断，见该文件的说明。
 
         // 速度归零由房主下发（GainSpeedAttribute 内部走 RPC，按玩家精确生效，各端同步）。
         // 注意：这里不能以"本地玩家是否抓捕者"为前提提前返回，否则房主是道具方时抓捕者会漏冻。
@@ -165,11 +212,42 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
                 player.GainSpeedAttribute(0f, hidingTime, false, 100, "HsgPropHuntFreeze");
             }
         }
+    }
 
-        // 全屏遮挡只给本地抓捕者看。
-        var local = GamePlayer.LocalPlayer;
-        if (local != null && local.IsImpostor)
-            PatchManager.ShowScreenOverlay(new Color(0f, 0f, 0f, 1f), hidingTime);
+    /// <summary>解冻抓捕者。躲藏阶段结束时由房主调用。</summary>
+    [OnlyHost]
+    private static void UnfreezeSeekers()
+    {
+        foreach (var player in GamePlayer.AllPlayers.Where(p => p != null && p.IsImpostor))
+        {
+            // 冻结本来就是带时长的，正常会自然过期；
+            // 这里再显式移除一次，防止房主中途改过躲藏时长导致两边差几帧。
+            player.RemoveAttributeByTag("HsgPropHuntFreeze");
+        }
+    }
+
+    /// <summary>终盘加成：给指定抓捕者加速并加快冷却。</summary>
+    [OnlyHost]
+    private static void ApplySeekerBoost(GamePlayer player)
+    {
+        float boostTime = PropHuntSettings.SeekerBoostTime.GetValue();
+        if (boostTime <= 0f) return;
+
+        // 时长给得比剩余时间宽一点：剩余时间还会被击空 / 嘲讽继续往下扣，
+        // 属性提前失效比多留几秒难受得多。
+        float duration = Mathf.Max(1f, PropHuntState.Remaining + 10f);
+
+        float speed = PropHuntSettings.SeekerBoostSpeed.GetValue();
+        if (speed > 1f)
+            player.GainSpeedAttribute(speed, duration, false, 60, "HsgPropHuntBoostSpeed");
+
+        float ratio = Mathf.Clamp(PropHuntSettings.SeekerBoostCooldownRatio.GetValue(), 0.05f, 1f);
+        if (ratio < 1f)
+        {
+            // CooldownSpeed 是「冷却推进速度」的乘数，所以倍率要取倒数：
+            // 想让冷却只花一半时间，推进速度就得是两倍。
+            player.GainAttribute(PlayerAttributes.CooldownSpeed, duration, 1f / ratio, false, 60, "HsgPropHuntBoostCd");
+        }
     }
 
     /// <summary>应用抓捕者视野倍率（对应原版预设的 ImpostorLightMod）。</summary>
@@ -207,14 +285,20 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             PropHuntPhase.Hiding =>
                 $"<color=#88CCFF>{Language.Translate("hsg.propHunt.hud.hiding")}</color> {clock}",
             PropHuntPhase.Hunting when PropHuntState.IsFinalCountdown =>
-                $"<color=#FF5555>{Language.Translate("hsg.propHunt.hud.final")}</color> {clock}",
+                $"<color=#FF5555>{Language.Translate("hsg.propHunt.hud.final")}</color> {clock}{BuildBoostSuffix()}",
             PropHuntPhase.Hunting =>
-                $"{Language.Translate("hsg.propHunt.hud.remaining")} {clock}",
+                $"{Language.Translate("hsg.propHunt.hud.remaining")} {clock}{BuildBoostSuffix()}",
             _ => string.Empty,
         };
     }
 
     #endregion
+
+    /// <summary>终盘加成期间在倒计时后面挂一个标记，双方都看得到，免得躲藏方莫名其妙被追上。</summary>
+    private static string BuildBoostSuffix()
+        => PropHuntState.IsSeekerBoost
+            ? $" <color=#FFAA33>{Language.Translate("hsg.propHunt.hud.boost")}</color>"
+            : string.Empty;
 
     #region 每帧
 
@@ -222,9 +306,12 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
     {
         if (!PropHuntGameModeRegistration.IsPropHuntMode) return;
 
-        // 这两项不受阶段限制：结算后危险度要归零收起，任务栏文案在死亡后也要能切换。
+        // 这几项不受阶段限制：结算后危险度要归零收起，任务栏文案在死亡后也要能切换，
+        // 演出层要负责把黑幕收掉，技能层要负责把相机还给本人、把过期替身清掉。
         PropHuntDangerMeter.Update();
         PropHuntTaskDisplay.Refresh();
+        PropHuntOverlay.Update();
+        PropHuntSkills.Update();
 
         if (PropHuntState.Phase is PropHuntPhase.None or PropHuntPhase.Finished) return;
 
@@ -245,6 +332,9 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             switch (PropHuntState.Phase)
             {
                 case PropHuntPhase.Hiding:
+                    // 躲藏倒计时归零 → 解冻抓捕者 → 换上追捕倒计时。
+                    // 冷却重置在 RpcSync 的阶段跃迁里由各端自行完成。
+                    UnfreezeSeekers();
                     PropHuntState.HostSet(PropHuntPhase.Hunting, PropHuntSettings.EscapeTime.GetValue());
                     return;
 
@@ -253,6 +343,14 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
                     TriggerEnd(PropHuntGameEnds.PropWin, p => !p.IsImpostor);
                     return;
             }
+        }
+
+        // 终盘加成：进入窗口时下发一次。
+        if (!boostApplied && PropHuntState.IsSeekerBoost)
+        {
+            boostApplied = true;
+            foreach (var player in GamePlayer.AllPlayers.Where(p => p != null && p.IsImpostor && !p.IsDead))
+                ApplySeekerBoost(player);
         }
 
         // 抓完所有道具：抓捕者胜利。
@@ -369,14 +467,19 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             // 演出所有人都放，与原版一致。
             PropHuntUtility.PlayMissEffect();
 
-            if (!PropHuntSettings.DestroyPropOnMiss) return;
-
             var control = Helpers.GetPlayer(playerId);
             if (control == null) return;
 
             float radius = GameOptionsManager.Instance.CurrentGameOptions.GetInt(
                                AmongUs.GameOptions.Int32OptionNames.KillDistance)
                            + PropHuntSettings.MissDestroyRadiusBonus.GetValue();
+
+            // 替身先于真控制台结算：抓捕者砍到假道具时，砍碎的应该是那个假道具，
+            // 而不是它旁边某个无辜的真控制台。砍碎替身之后这一刀就算完了。
+            // 注意惩罚（扣时间、强制冷却）照样生效 —— 替身的价值就在于骗出这一刀。
+            if (PropHuntDecoys.DestroyNearest(control.transform.position, radius)) return;
+
+            if (!PropHuntSettings.DestroyPropOnMiss) return;
 
             var closest = PropHuntUtility.FindClosestConsole(control.gameObject, radius);
             if (closest != null) UnityEngine.Object.Destroy(closest);
@@ -390,6 +493,9 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         if (PropHuntState.Phase != PropHuntPhase.Hunting) return;
         if (ev.Player == null || ev.Player.IsImpostor) return;
 
+        // 死人的替身不该继续在场上骗人。
+        PropHuntDecoys.ClearOwnedBy(ev.Player.PlayerId);
+
         if (PropHuntSettings.Infection)
         {
             // 感染模式：被抓的道具原地复活并转为抓捕者。
@@ -397,6 +503,9 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             var position = ev.Player.TruePosition;
             ev.Player.Revive(null, position, true, false);
             ev.Player.SetRole(Nebula.Roles.Impostor.Impostor.MyRole);
+
+            // 已经进入终盘窗口的话，新转化的抓捕者也要跟上，否则他会比同伴慢一截。
+            if (boostApplied) ApplySeekerBoost(ev.Player);
         }
     }
 
@@ -438,10 +547,32 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
             GameEndReason.Special);
     }
 
+    /// <summary>
+    /// 抓捕者明牌：名字染成内鬼红并挂一个标签，所有人都看得到。
+    ///
+    /// 走 Nebula 的 PlayerDecorateNameEvent，由 PlayerModInfo.UpdateNameText 每帧触发。
+    /// 这里不加 [Local] / [OnlyMyPlayer] 之类的过滤特性 ——
+    /// 我们要的就是「每个客户端看每一个抓捕者」都生效。
+    ///
+    /// 躲藏者变成道具之后 PlayerControl.Visible 是 false，名字跟着一起隐藏，
+    /// 所以这个装饰实际上只会出现在抓捕者头上，不会把躲藏者暴露出去。
+    /// </summary>
+    void OnDecorateName(PlayerDecorateNameEvent ev)
+    {
+        if (!PropHuntGameModeRegistration.IsPropHuntMode) return;
+        if (!PropHuntSettings.SeekerNameTag) return;
+        if (ev.Player == null || !ev.Player.IsImpostor) return;
+
+        ev.Color = Virial.Color.ImpostorColor;
+        ev.Name = ev.Name + " " + Language.Translate("hsg.propHunt.hud.seekerTag");
+    }
+
     void OnGameEnd(GameEndEvent ev)
     {
         ClearArrows();
         PropManager.Clear();
+        PropHuntSkills.Teardown();
+        PropHuntOverlay.Teardown();
         PropHuntDangerMeter.Teardown();
         PropHuntTaskDisplay.RestoreProgressTracker();
         PropHuntState.Reset();

@@ -226,8 +226,9 @@
             void MayGuessed(PlayerMurderedEvent ev)
             {
                 if (!AmOwner || !isCheckTime || ev.Dead == MyPlayer || !MeetingHud.Instance || !GueWillQ) return;
-                if (ev.Murderer == ev.Dead) AmongUsUtil.PlayQuickFlash(GetColor(GueCorMurDie));
-                else AmongUsUtil.PlayQuickFlash(GetColor(GueCordie));
+                // 赌错 = 赌怪自杀（Murderer == Dead）→ "误赌"色；赌对 = 赌怪杀死别人 → "赌杀"色
+                if (ev.Murderer == ev.Dead) AmongUsUtil.PlayQuickFlash(GetColor(GueCordie));
+                else AmongUsUtil.PlayQuickFlash(GetColor(GueCorMurDie));
             }
         }
     }

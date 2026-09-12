@@ -147,8 +147,10 @@ public class Dilemma : DefinedRoleTemplate, DefinedRole, RuntimeAssignableGenera
                         int index = UnityEngine.Random.Range(0, alivePlayers2.Count);
                         var randomPlayer = alivePlayers2[index];
                         var targetRole = randomPlayer.Role.Role;
-                        MyPlayer.SetRole(targetRole, randomPlayer.Role.RoleArguments);
-                        randomPlayer.SetRole(MyOriginalRole, MyPlayer.Role.RoleArguments);
+                        // 先缓存双方参数再互换：原实现在自己 SetRole 之后才读 MyPlayer.Role.RoleArguments，拿到的是新角色的参数
+                        var targetArg = randomPlayer.Role.RoleArguments;
+                        MyPlayer.SetRole(targetRole, targetArg);
+                        randomPlayer.SetRole(MyOriginalRole, MyOriginalArg);
                         AmongUsUtil.PlayQuickFlash(Cor.MPCor);
                         Title?.SetText(Language.Translate("role.dilemma.hudtextChangeRole"), Cor.MPCor, 1.5f,true);
                     }

@@ -31,35 +31,42 @@ namespace NebulaN.Roles.Modifier
             public Instance(GamePlayer player) : base(player) { }
             void RuntimeAssignable.OnActivated()
             {
-                if (AmOwner)
-                    EraseSelfModiCounts = Karmatic.EraseKarmaMeetingTimes;
+                EraseSelfModiCounts = Karmatic.EraseKarmaMeetingTimes;
             }
-            [Local]
+
+            // PlayerCheckKilledEvent 只在房主客户端触发（见 API 注释）。
+            // 原来标的是 [Local]（只在持有者本机执行），两者只有持有者恰好是房主时才同时成立。
+            [OnlyHost]
             void KillSelf(PlayerCheckKilledEvent ev)
             {
                 if (ev.Killer != MyPlayer) return;
                 if (ev.Player == ev.Killer) return;
-                
                 if (ProcessingKarma) return;
+                if (Karmatic.NeedImp && MyPlayer.Role.Role.Category != RoleCategory.ImpostorRole) return;
 
                 ProcessingKarma = true;
-                if (Karmatic.NeedImp)
-                    if (MyPlayer.Role.Role.Category != RoleCategory.ImpostorRole)
-                        return;
-
-                ev.Result = KillResult.Guard;
-                AmongUsUtil.PlayQuickFlash(Cor.Violet);
-                if (Karmatic.DeadKillKarma)
+                try
                 {
-                    ev.Player.MurderPlayer(MyPlayer, null, null, KillParameter.NormalKill);
+                    ev.Result = KillResult.Guard;
+                    RpcKarmaFlash.Invoke(MyPlayer.PlayerId);
+                    if (Karmatic.DeadKillKarma)
+                        ev.Player.MurderPlayer(MyPlayer, PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill);
+                    else
+                        MyPlayer.Suicide(PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill);
                 }
-                else if (!Karmatic.DeadKillKarma)
+                finally
                 {
-                    MyPlayer.Suicide(PlayerState.Dead, null, KillParameter.NormalKill);
+                    // 原实现在 NeedImp 提前 return 时不会复位，之后永久失效
+                    ProcessingKarma = false;
                 }
-
-                ProcessingKarma = false;
             }
+
+            static readonly RemoteProcess<byte> RpcKarmaFlash = new("HSG.Karma.Flash", (playerId, _) =>
+            {
+                if (GamePlayer.GetPlayer(playerId)?.AmOwner == true)
+                    AmongUsUtil.PlayQuickFlash(Cor.Violet);
+            });
+
             [Local]
             void EraseKarma(MeetingPreEndEvent ev)
             {

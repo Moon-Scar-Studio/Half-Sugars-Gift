@@ -1,4 +1,4 @@
-
+﻿
 namespace HalfSugarGift.Core.Patch;
 
 [NebulaPreprocess(PreprocessPhase.PostLoadAddons)]

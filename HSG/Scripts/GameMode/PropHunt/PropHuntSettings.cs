@@ -177,6 +177,165 @@ public static class PropHuntSettings
 
     #endregion
 
+    #region 升级项：躲藏阶段的视野封锁
+
+    /// <summary>
+    /// 躲藏阶段是否给抓捕者上全屏黑幕。
+    ///
+    /// 旧版是靠 PatchManager.ShowScreenOverlay 实现的，但那个方法会把传入的 alpha 覆盖成 0.5，
+    /// 等于只加了一层灰纱，抓捕者照样能看清躲藏者往哪跑。
+    /// 现在由 PropHuntOverlay 接管，真正做到不透明，并在黑幕上显示倒计时。
+    /// </summary>
+    public static readonly BoolConfiguration SeekerBlackout =
+        NebulaAPI.Configurations.Configuration("options.hsg.propHunt.seekerBlackout", true);
+
+    /// <summary>
+    /// 抓捕者是否在所有人眼里明牌（名字变红 + 头顶挂标签）。
+    ///
+    /// 道具躲猫猫里「谁是猎人」本来就不是秘密 —— 抓捕者从开局就拿着刀满地图跑，
+    /// 藏着这个信息只会让躲藏方在第一次被砍之前都搞不清该躲谁。
+    /// 默认开启。
+    /// </summary>
+    public static readonly BoolConfiguration SeekerNameTag =
+        NebulaAPI.Configurations.Configuration("options.hsg.propHunt.seekerNameTag", true);
+
+    #endregion
+
+    #region 升级项：终盘加成
+
+    /// <summary>
+    /// 追捕剩余多少秒时给抓捕者上加成。0 表示关闭。
+    ///
+    /// 与 <see cref="FinalCountdownTime"/> 是两件事：那个控制的是情报（Ping / 箭头），
+    /// 这个控制的是机动力。默认 60 秒，通常比情报阶段更早开始，
+    /// 让抓捕者先「跑得动」，再「看得见」。
+    /// </summary>
+    public static readonly FloatConfiguration SeekerBoostTime =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.seekerBoostTime", (0f, 180f, 10f), 60f,
+            FloatConfigurationDecorator.Second);
+
+    /// <summary>终盘的移动速度倍率。</summary>
+    public static readonly FloatConfiguration SeekerBoostSpeed =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.seekerBoostSpeed", (1f, 2f, 0.05f), 1.25f,
+            FloatConfigurationDecorator.Ratio, () => SeekerBoostTime.GetValue() > 0f);
+
+    /// <summary>
+    /// 终盘的冷却倍率。0.5 表示冷却只要一半时间。
+    ///
+    /// 实现走 PlayerAttributes.CooldownSpeed（系数 = 1 / 本值）。
+    /// 选它而不是 KillButtonLikeHandler.SetCooldown 的理由：
+    /// CooldownSpeed 会被 TimerImpl 和原版击杀计时器同时读取，
+    /// 所以「正在走的那一次冷却」也会立刻加速，不必等下一次才生效。
+    /// </summary>
+    public static readonly FloatConfiguration SeekerBoostCooldownRatio =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.seekerBoostCooldownRatio", (0.25f, 1f, 0.05f), 0.5f,
+            FloatConfigurationDecorator.Ratio, () => SeekerBoostTime.GetValue() > 0f);
+
+    #endregion
+
+    #region 升级项：躲藏者趣味技能
+
+    /// <summary>趣味技能总开关。关掉之后下面所有躲藏者技能一并消失。</summary>
+    public static readonly BoolConfiguration EnableHiderSkills =
+        NebulaAPI.Configurations.Configuration("options.hsg.propHunt.hiderSkills", true);
+
+    // --- 队友视角 ---
+
+    /// <summary>藏好之后能不能切到队友视角观战。</summary>
+    public static readonly BoolConfiguration EnableSpectate =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.spectate", true, () => EnableHiderSkills);
+
+    /// <summary>是否必须先变成道具才能观察队友。关掉就是随时可看。</summary>
+    public static readonly BoolConfiguration SpectateNeedsDisguise =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.spectateNeedsDisguise", true,
+            () => EnableHiderSkills && EnableSpectate);
+
+    // --- 嘲讽 ---
+
+    /// <summary>嘲讽：主动暴露自己的位置，换取追捕倒计时缩短。</summary>
+    public static readonly BoolConfiguration EnableTaunt =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.taunt", true, () => EnableHiderSkills);
+
+    /// <summary>嘲讽冷却。</summary>
+    public static readonly FloatConfiguration TauntCooldown =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.tauntCooldown", (5f, 120f, 5f), 30f,
+            FloatConfigurationDecorator.Second, () => EnableHiderSkills && EnableTaunt);
+
+    /// <summary>每人可用的嘲讽次数。0 表示不限次。</summary>
+    public static readonly IntegerConfiguration TauntCharges =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.tauntCharges", (0, 10, 1), 3,
+            () => EnableHiderSkills && EnableTaunt);
+
+    /// <summary>
+    /// 一次嘲讽从追捕倒计时里扣掉的秒数。
+    /// 这是躲藏方付出「暴露位置」之后拿到的回报，走的是与击空惩罚同一条 HostAdjust 通道。
+    /// 设为 0 就是纯粹的整活，不影响胜负。
+    /// </summary>
+    public static readonly FloatConfiguration TauntTimeBonus =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.tauntTimeBonus", (0f, 30f, 1f), 5f,
+            FloatConfigurationDecorator.Second, () => EnableHiderSkills && EnableTaunt);
+
+    // --- 替身 ---
+
+    /// <summary>替身：在原地留下一个假道具后自己溜走。</summary>
+    public static readonly BoolConfiguration EnableDecoy =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.decoy", true, () => EnableHiderSkills);
+
+    /// <summary>替身冷却。</summary>
+    public static readonly FloatConfiguration DecoyCooldown =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.decoyCooldown", (10f, 180f, 5f), 45f,
+            FloatConfigurationDecorator.Second, () => EnableHiderSkills && EnableDecoy);
+
+    /// <summary>替身留在场上的时间。</summary>
+    public static readonly FloatConfiguration DecoyDuration =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.decoyDuration", (5f, 120f, 5f), 30f,
+            FloatConfigurationDecorator.Second, () => EnableHiderSkills && EnableDecoy);
+
+    /// <summary>每人可用的替身次数。0 表示不限次。</summary>
+    public static readonly IntegerConfiguration DecoyCharges =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.decoyCharges", (0, 10, 1), 2,
+            () => EnableHiderSkills && EnableDecoy);
+
+    #endregion
+
+    #region 升级项：抓捕者技能
+
+    /// <summary>
+    /// 声呐：抓捕者主动扫描周围，Ping 出范围内所有躲藏者。
+    ///
+    /// 默认关闭。它存在的意义是让房主在打开躲藏者技能之后有一个对称的补偿旋钮，
+    /// 而不是让抓捕方单方面吃瘪。
+    /// </summary>
+    public static readonly BoolConfiguration EnableSeekerSonar =
+        NebulaAPI.Configurations.Configuration("options.hsg.propHunt.sonar", false);
+
+    /// <summary>声呐冷却。</summary>
+    public static readonly FloatConfiguration SonarCooldown =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.sonarCooldown", (10f, 180f, 5f), 45f,
+            FloatConfigurationDecorator.Second, () => EnableSeekerSonar);
+
+    /// <summary>声呐半径。</summary>
+    public static readonly FloatConfiguration SonarRadius =
+        NebulaAPI.Configurations.Configuration(
+            "options.hsg.propHunt.sonarRadius", (5f, 40f, 1f), 15f,
+            FloatConfigurationDecorator.None, () => EnableSeekerSonar);
+
+    #endregion
+
     #region 设置页装配
 
     /// <summary>本模式的设置容器。只在道具躲猫猫模式下显示。</summary>
@@ -202,9 +361,31 @@ public static class PropHuntSettings
             .AppendConfiguration(EnablePropMechanics)
             .AppendConfiguration(SeekerCount)
             .AppendConfiguration(HidingTime)
+            .AppendConfiguration(SeekerBlackout)
+            .AppendConfiguration(SeekerNameTag)
             .AppendConfiguration(EscapeTime)
             .AppendConfiguration(FinalCountdownTime)
             .AppendConfiguration(SeekerKillCooldown)
+            // 终盘加成
+            .AppendConfiguration(SeekerBoostTime)
+            .AppendConfiguration(SeekerBoostSpeed)
+            .AppendConfiguration(SeekerBoostCooldownRatio)
+            // 躲藏者趣味技能
+            .AppendConfiguration(EnableHiderSkills)
+            .AppendConfiguration(EnableSpectate)
+            .AppendConfiguration(SpectateNeedsDisguise)
+            .AppendConfiguration(EnableTaunt)
+            .AppendConfiguration(TauntCooldown)
+            .AppendConfiguration(TauntCharges)
+            .AppendConfiguration(TauntTimeBonus)
+            .AppendConfiguration(EnableDecoy)
+            .AppendConfiguration(DecoyCooldown)
+            .AppendConfiguration(DecoyDuration)
+            .AppendConfiguration(DecoyCharges)
+            // 抓捕者技能
+            .AppendConfiguration(EnableSeekerSonar)
+            .AppendConfiguration(SonarCooldown)
+            .AppendConfiguration(SonarRadius)
             .AppendConfiguration(ShowDangerMeter)
             .AppendConfiguration(DangerWarnDistance)
             .AppendConfiguration(DangerAlertDistance)

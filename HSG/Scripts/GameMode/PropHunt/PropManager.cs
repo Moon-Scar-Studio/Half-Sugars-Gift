@@ -19,6 +19,15 @@ public static class PropManager
     /// <summary>玩家 → 道具渲染器。</summary>
     private static readonly Dictionary<byte, SpriteRenderer> PlayerToProp = new();
 
+    /// <summary>
+    /// 玩家 → 他当前伪装成的控制台索引。
+    ///
+    /// 原版只需要把 sprite 抄过去就完事，不关心抄的是哪一个；
+    /// 「替身」需要在别处重建同一个贴图，所以必须把索引留下来。
+    /// 生命周期跟着 PlayerToProp 走：变身时写入，变回 / 死亡 / 清场时抹掉。
+    /// </summary>
+    private static readonly Dictionary<byte, int> PlayerToConsoleIndex = new();
+
     #region 生命周期
 
     /// <summary>给玩家挂载道具渲染器。由 PlayerControl.Start 的补丁调用。</summary>
@@ -39,6 +48,8 @@ public static class PropManager
     /// <summary>移除某个玩家的道具渲染器。</summary>
     public static void Detach(byte playerId)
     {
+        PlayerToConsoleIndex.Remove(playerId);
+
         if (!PlayerToProp.TryGetValue(playerId, out var renderer)) return;
         if (renderer != null) UnityEngine.Object.Destroy(renderer.gameObject);
         PlayerToProp.Remove(playerId);
@@ -52,6 +63,7 @@ public static class PropManager
             if (renderer != null) UnityEngine.Object.Destroy(renderer.gameObject);
         }
         PlayerToProp.Clear();
+        PlayerToConsoleIndex.Clear();
     }
 
     #endregion
@@ -73,6 +85,14 @@ public static class PropManager
 
     public static bool IsDisguised(PlayerControl? player)
         => player != null && IsDisguised(player.PlayerId);
+
+    /// <summary>取出该玩家当前伪装成的控制台索引。没在伪装时返回 false。</summary>
+    public static bool TryGetConsoleIndex(byte playerId, out int consoleIndex)
+    {
+        consoleIndex = -1;
+        if (!IsDisguised(playerId)) return false;
+        return PlayerToConsoleIndex.TryGetValue(playerId, out consoleIndex);
+    }
 
     #endregion
 
@@ -102,6 +122,7 @@ public static class PropManager
             renderer.transform.localScale = consoleObject.transform.lossyScale * PropScaleFactor;
             renderer.transform.localPosition = new Vector3(0f, 0f, PropZOffset);
             renderer.sprite = consoleRenderer.sprite;
+            PlayerToConsoleIndex[message.playerId] = message.consoleIndex;
 
             SetBodyVisible(message.playerId, false);
         });
@@ -124,6 +145,7 @@ public static class PropManager
 
             renderer.sprite = null;
             renderer.transform.localPosition = new Vector3(0f, 0f, PropZOffset);
+            PlayerToConsoleIndex.Remove(playerId);
             SetBodyVisible(playerId, true);
         });
 

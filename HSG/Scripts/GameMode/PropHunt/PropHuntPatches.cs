@@ -105,7 +105,9 @@ public static class PropHuntHarmony
     {
         PropManager.Clear();
         // 中途退出时 GameEndEvent 不一定跑得到，这里也收一次尾，
-        // 否则任务进度条会一直被隐藏、污染之后的普通对局。
+        // 否则任务进度条会一直被隐藏、相机会一直卡在别人身上、污染之后的普通对局。
+        PropHuntSkills.Teardown();
+        PropHuntOverlay.Teardown();
         PropHuntDangerMeter.Teardown();
         PropHuntTaskDisplay.RestoreProgressTracker();
         PropHuntState.Reset();
@@ -119,6 +121,9 @@ public static class PropHuntHarmony
 
         PropManager.Detach(__instance.PlayerId);
         __instance.Visible = true;
+
+        // 本人被抓：立刻退出队友视角，别让死人继续蹭观战。
+        if (__instance.AmOwner) PropHuntSpectator.Stop();
     }
 
     #endregion

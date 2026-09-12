@@ -19,6 +19,7 @@ public class HIGH : DefinedAllocatableModifierTemplate, DefinedAllocatableModifi
     public class Instance : RuntimeAssignableTemplate, RuntimeModifier
     {
         DefinedModifier RuntimeModifier.Modifier => MyRole as DefinedModifier ?? throw new System.InvalidOperationException();
+        const string SizeTag = "HSG.HIGH.Size";
 
         public Instance(GamePlayer player) : base(player)
         {
@@ -51,8 +52,7 @@ public class HIGH : DefinedAllocatableModifierTemplate, DefinedAllocatableModifi
         {
             huoYue = false;
             xieCheng = null;
-            MyPlayer.RemoveAttributeByTag("HIGH_SizeTag");
-
+            MyPlayer.RemoveAttributeByTag(SizeTag);
         }
 
         System.Collections.IEnumerator GengXinXieCheng()
@@ -66,13 +66,14 @@ public class HIGH : DefinedAllocatableModifierTemplate, DefinedAllocatableModifi
 
         void SuiJiChange()
         {
-
             float min = zuiXiao;
             float max = zuiDa;
             if (min > max) (min, max) = (max, min);
-            float suiJiY = UnityEngine.Random.Range(min, max);
-            MyPlayer.RemoveAttributeByTag("HIGH_SizeTag");
-            HostSendRpc.SetSizeY(MyPlayer, suiJiY);
+            float v = UnityEngine.Random.Range(min, max);
+            // GainSizeAttribute 自带全网同步，且同 tag 会直接替换旧属性：
+            // 不需要先 RemoveAttributeByTag（原实现每 0.05 秒发一次移除 RPC + 一次尺寸 RPC，纯浪费），
+            // 也不需要绕道 HostSendRpc。HIGH / WIDE 使用不同 tag，同时持有时不会互相覆盖。
+            MyPlayer.GainSizeAttribute(new Virial.Compat.Vector2(1f, v), 1000f, true, 50, SizeTag);
         }
     }
 }

@@ -31,7 +31,7 @@ public class Turtle : DefinedAllocatableModifierTemplate,DefinedAllocatableModif
         void RuntimeAssignable.OnActivated()
         {
             if (!AmOwner) return;
-            MyPlayer.GainSpeedAttribute(0.75f, float.MaxValue, true, 50);
+            MyPlayer.GainSpeedAttribute(0.75f, float.MaxValue, true, 50, SpeedTag); // 必须带 tag，OnReleased 才能按 tag 移除
         }
 
         void IGameOperator.OnReleased()=>MyPlayer.RemoveAttributeByTag(SpeedTag);

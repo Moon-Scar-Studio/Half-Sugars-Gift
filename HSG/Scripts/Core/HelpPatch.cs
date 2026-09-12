@@ -42,8 +42,7 @@ public static class HelpPatch
     public static void Preprocess(NebulaPreprocessor preprocessor)
     {
         // 注册翻译
-        Language.Register(StarsTabTranslateKey, () => "星标");
-        Language.Register("help.stars.empty", () => "暂无星标，点击职业详情页的星标按钮添加");
+        // 文案改由 Language/*.dat 提供（help.tabs.stars / help.stars.empty），不再在代码里硬编码中文
 
         // 缓存反射方法
         _cachedOpenAssignableHelpMethod = typeof(HelpScreen).GetMethod(

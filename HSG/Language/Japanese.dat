@@ -1,7 +1,4 @@
-#船员
-
-
-
+﻿# Half Sugar's Gift - 日本語 (未翻訳のキーは English.dat にフォールバックします)
 "role.maskedDancer.name" : "仮面の踊り子"
 "role.maskedDancer.short" : "舞"
 "role.maskedDancer.blurb" : "私と一緒に踊りませんか？"
@@ -12,47 +9,16 @@
 "role.maskeddancer.doc.invite" : "<b>招待</b><br>一人を舞踏会に招待します"
 "role.maskeddancer.doc.start" : "<b>舞踏会開始</b><br>3人招待後、舞踏会を開始できます。"
 "role.maskedDancer.tips" : "<b>· 3人招待後、次のラウンドでしか舞踏会を開始できません</b>"
-"options.role.maskeddancer.inviteCooldownFirst" : "初回招待クールダウン"
-"options.role.maskeddancer.inviteCooldownSecond" : "2回目の招待クールダウン"
-"options.role.maskeddancer.inviteCooldownThird" : "3回目の招待クールダウン"
 "options.role.maskeddancer.partyuses" : "舞踏会回数"
 "button.label.maskedDancer.invite" : "招待"
 "button.label.maskedDancer.start" : "舞踏会開始"
 "options.role.maskeddancer.startcooldown" : "舞踏会開始クールダウン"
-
 "achievement.maskedDancer.party.title" : "偽りの仮面"
 "achievement.maskedDancer.party.goal" : "舞踏会を1回開始する。"
-
 "achievement.maskedDancer.accident.title" : "事故発生！"
 "achievement.maskedDancer.accident.goal" : "誰かが舞踏会事故で死亡する。"
-
 "achievement.maskedDancer.suicide.title" : "砕けた仮面"
 "achievement.maskedDancer.suicide.goal" : "仮面の踊り子が舞踏会で自害する。"
-
-
-
-
-
-
-
-
-"role.referee.name" : "審判"
-"role.referee.short" : "審判"
-"role.referee.blurb" : "私の期待を裏切らないで"
-"role.referee.doc" : "1人のプレイヤーを大神官に勧誘する。<br>インポスターや中立を勧誘した場合、設定によって自殺することがある。<br><b>第1ラウンドでは勧誘不可。</b>"
-"role.referee.ability.title" : "<b>固有アビリティ【正義の裁断】</b>"
-"role.referee.ability.main" : "1人のプレイヤーを大神官に勧誘できる。第1ラウンドではスキル使用不可。"
-"role.referee.doc.recruit" : "<b>勧誘</b><br>対象を大神官にする"
-"options.role.referee.detail" : "審判は1人を大神官に勧誘できる。<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-
-"options.role.referee.cooldown" : "勧誘クールダウン"
-"options.role.referee.uses" : "勧誘回数"
-"options.role.referee.suicideImpostor" : "インポスターを勧誘したら自殺"
-"options.role.referee.suicideNeutral" : "中立を勧誘したら自殺"
-"options.role.referee.suicideCrewmate" : "クルーメイトを勧誘したら自殺"
-"button.label.referee.recruit" : "勧誘"
-
-
 "role.wish.name" : "「願」"
 "role.wish.blurb" : "願わくば次に会うときは生死の隔たりがありませんように"
 "role.wish.short" : "願"
@@ -68,88 +34,6 @@
 "options.role.wish.suicideNeutral" : "中立陣営に祈願したとき死亡するか"
 "options.role.wish.suicideCrewmate" : "クルーメイトに祈願したとき死亡するか"
 "button.label.wish.mark" : "祈願"
-
-
-
-
-
-
-#伪装者
-
-
-"role.BeNothing.name" : "裏切りの彗星の子"
-"role.BeNothing.short" : "叛彗"
-"role.BeNothing.blurb" : "彼らにとどめを刺せ"
-"options.role.BeNothing.detail" : "透明状態になり、移動速度が大幅に上昇します。<br>効果時間終了後に元に戻ります。<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-"role.BeNothing.doc" : "<b>この職業はテスト用で、チート級＋バグの両方があります。</b><br><b>通常プレイでは使用しないでください。</b><br>透明状態になり、移動速度が大幅に上昇します。効果時間終了後に元に戻ります。"
-"options.role.BeNothing.cooldown" : "透明化クールダウン"
-"options.role.BeNothing.duration" : "透明化持続時間"
-"options.role.BeNothing.speedMultiplier" : "加速倍率"
-"button.label.BeNothing" : "透明化"
-
-"achievement.BeNothing.common1.title" : "？"
-"achievement.BeNothing.common1.cond" : "存在しないもの"
-"achievement.BeNothing.common1.goal" : "邪悪な彗星の子の職業を獲得する"
-
-"role.restorer.name" : "還元者"
-"role.restorer.short" : "還"
-"role.restorer.blurb" : "最も純真な自分を思い出そう"
-"options.role.restorer.detail" : "プレイヤーを1人選び、次の会議ラウンド終了後、<br>その職業を初期状態に還元する。<br><b>これは Half Sugar からのプレゼントの一つです！</b>。"
-"role.restorer.doc" : "還元者は他のプレイヤーにマークを付け、次の会議終了後にその職業を強制変更します。<br><br>スキルで対象を選ぶと、相手は最も基本の職業に「還元」されます：クルーメイト、インポスター、または道化師。"
-"role.restorer.doc.image" : "<b>還元</b><br>対象をその原初の職業に還元する。<br>クルーメイト陣営 - クルーメイト、インポスター陣営 - インポスター、中立陣営 - <b>道化師</b><br>還元の使用可能回数は<b><color=#00ffff>%USES%回</color></b>"
-"options.role.restorer.cooldown" : "還元クールダウン"
-"options.role.restorer.skillUses" : "還元使用可能回数"
-"button.label.restorer" : "還元"
-"role.restorer.ability.title" : "<b>固有アビリティ【原初の時】</b>"
-"role.restorer.ability.main" : "還元を使って他人の職業を還元できる"
-"role.restorer.tips" : "·<b>還元した道化師を追放しないでね！</b><br>·この職業は<b>抹消者</b>を参考にしています"
-
-"achievement.restorer.common.restored.title" : "私は誰？ここはどこ？"
-"achievement.restorer.common.restored.cond" : ""
-"achievement.restorer.common.restored.goal" : "還元者に職業を還元される。"
-
-
-"achievement.restorer.common.win.title" : "すべては最初と同じ"
-"achievement.restorer.common.win.cond" : ""
-"achievement.restorer.common.win.goal" : "1回勝利する"
-
-
-"achievement.restorer.common.dead.title" : "終末"
-"achievement.restorer.common.dead.cond" : "ヒント：もしかしたら最初にキルされる必要がある？"
-"achievement.restorer.common.dead.goal" : "還元スキル未使用のまま死亡する"
-
-
-"achievement.restorer.challenge.same.title" : "まさか私と同じ魔法とは"
-"achievement.restorer.challenge.same.cond" : ""
-"achievement.restorer.challenge.same.goal" : "別の還元者を還元する"
-
-
-"achievement.restorer.challenge.all.title" : "その場にいる全員を還元する"
-"achievement.restorer.challenge.all.cond" : "ヒント：5人以内での達成を推奨"
-"achievement.restorer.challenge.all.goal" : "全員の職業を還元する"
-
-
-"achievement.restorer.challenge.unused.title" : "何か忘れてる？"
-"achievement.restorer.challenge.unused.cond" : ""
-"achievement.restorer.challenge.unused.goal" : "1ゲーム中一度も還元を使わない"
-
-
-"achievement.restorer.challenge.jesterWin.title" : "天からの歓喜！"
-"achievement.restorer.challenge.jesterWin.cond" : "ヒント：追放する前に結果を考えてね"
-"achievement.restorer.challenge.jesterWin.goal" : "還元者に還元された道化師を追放する"
-"achievement.restorer.challenge.jesterWin.splitted.0" : "天からの"
-"achievement.restorer.challenge.jesterWin.splitted.1" : "失敗"
-"achievement.restorer.challenge.jesterWin.splitted.2" : "陽気な"
-
-
-
-
-
-
-
-
-
-
 "role.objector.name" : "異議者"
 "role.objector.blurb" : "私は今回の会議結果に納得していません"
 "role.objector.doc" : "<b>この職業にはバグがあります。</b><br>会議で<b>異議</b>スキルを使用できます。<br>異議を使用すると、そのラウンドの全員の投票は棄権票に変換されます"
@@ -161,60 +45,6 @@
 "role.objector.tips" : "<b>·匿名投票でない場合はこの職業の使用を推奨しません</b>"
 "options.role.objector.uses" : "異議の最大使用回数"
 "objector.ui.uses" : "残り異議回数：%LEFTUSES%"
-
-
-
-"role.owl.name" : "フクロウ"
-"role.owl.short" : "鷹"
-"role.owl.blurb" : "深夜の者が私のために動く！"
-"role.owl.doc" : "催眠を使って一人を催眠にかけられます。<br>催眠された者は1回のキルチャンスを得て、インポスター陣営としてカウントされます。<br>催眠された者が1人キルすると正常に戻ります。キルしない時間が<b><color=#00ffff>%DUR%秒</color></b>を超えると、<b>催眠された者は自殺します。</b>"
-"options.role.owl.detail" : "フクロウは他人を催眠できます。<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-"role.owl.ability.title" : "<b>固有アビリティ【催眠】</b>"
-"role.owl.ability.main" : ""
-"role.owl.tips" : "<b>·噬魂を使用すると、催眠された者のそばに瞬間移動してその者をキルします。催眠者が静かに自殺するのではありません。</b>"
-"options.role.owl.cooldown" : "催眠クールダウン"
-"options.role.owl.maxUses" : "最大催眠回数"
-"options.role.owl.duration" : "催眠者自殺制限時間"
-"options.role.owl.privateChat" : "プライベートチャット"
-"options.role.owl.soulEatCooldown" : "噬魂クールダウン"
-"button.label.owl.hypnotize" : "催眠"
-"button.label.owl.soulEat" : "噬魂"
-"button.label.owl.soulEatMeeting" : "噬魂"
-"role.owl.doc.hypnotize" : "<b>催眠</b><br>一人を催眠する。最大<b><color=#00ffff>%MAXUSES%</color></b>回。"
-"role.owl.doc.soulEat" : "<b>噬魂</b><br>催眠された者を即死させる。"
-"owl.chatName" : "フクロウ"
-
-
-
-#中立
-
-"role.Havenger.blurb" : "目には目を、命には命を"
-"role.Havenger.doc" : "<b>この職業にはバグがあります</b><br>フリーフェイズ中にキルされた場合、死体が消え、次のラウンドで尋仇状態になります。<br>その間、会議は禁止され、全員 VENT 禁止。<br>間違ってキルすると、尋仇者とキルされた者が死亡、時間切れなら尋仇者が死亡、正しくキルできれば尋仇者が勝利します。"
-"role.Havenger.name" : "尋仇者"
-"role.Havenger.tips" : "·あなたの尋仇キル回数は一度だけです。"
-"options.role.Havenger.detail" : "尋仇者は死亡後、殺害者に復讐しなければならない<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-"role.Havenger.short" : "尋"
-"options.role.Havenger.revengeDuration" : "尋仇持続時間"
-"teams.Havenger" : "尋仇者"
-"HavengerWin" : "尋仇者の勝利"
-"button.label.Havenger.kill" : "復讐"
-
-"achievement.avenger.common.revenge.title" : "血の報い"
-"achievement.avenger.common.revenge.goal" : "殺害者をキルする"
-"achievement.avenger.common.revenge.cond" : ""
-
-"achievement.avenger.common.wrongKill.title" : "無実の者を殺す"
-"achievement.avenger.common.wrongKill.goal" : "尋仇フェーズで殺害者以外をキルする"
-"achievement.avenger.common.wrongKill.cond" : ""
-
-"achievement.avenger.common.timeout.title" : "魂の消失"
-"achievement.avenger.common.timeout.goal" : "尋仇時間が終了し、誰もキルしていない"
-"achievement.avenger.common.timeout.cond" : ""
-
-
-
-
-
 "role.imagination.name" : "想像力"
 "role.imagination.short" : "想"
 "role.imagination.blurb" : "豊かな想像"
@@ -225,65 +55,20 @@
 "options.role.imagination.detail" : "想像力はラウンドごとに職業を一つ想像し、その特性を得る<br>最後まで生き残り勝利を奪う。<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
 "role.imagination.ability.title" : "<b>固有アビリティ【想像力抜群】</b>"
 "role.imagination.ability.main" : "各ラウンドの会議終了後またはゲーム開始時に職業を一つ選び、その能力を得られます。<br>そのラウンド終了後、再び職業を選ぶ必要があります。"
-"role.imagination.doc.skill" : "<b>想像</b><br>ラウンドごとに自動使用、職業を選びその能力を得る。"
 "role.imagination.tips" : "<b>·特定の職業は選択してもそのスキルを持てません。</b><br><b>·勝利を奪うことができます。</b>"
-
 "role.imagination.prefix" : "想像の%ROLE%"
 "role.imagination.select" : "想像する職業を選んでください（選択後、このウィンドウを手動で閉じてください）"
-
-"role.spirit.name" : "「霊」"
-"role.spirit.short" : "霊"
-"role.spirit.blurb" : "霊は生まれ、砕け、大業を託す。霊は連なり、霊はまた霊を砕く。尽きることなし。"
-"role.spirit.doc" : "霊撃を使って選択した者を自殺させることができます。<br><b>還霊</b>を使って他者を霊にし、自身は砕霊になります。"
-"options.role.spirit.detail" : "他人を霊に変え、共に勝利する<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-"role.spirit.ability.title" : "<b>固有アビリティ【霊焔】</b>"
-"role.spirit.ability.main" : "特殊なキル能力を持ち、選択した者を直接自殺させることができます。回数はホスト設定に依存。<br>キル回数を使い切ると還霊スキルがアンロックされます。<br>誰かに使うと、その人を霊にし、あなたは砕霊になります。<br>砕霊がキルできるかどうか、キル回数はホスト設定に依存。<br>霊が死亡すると、すべての砕霊も連鎖死亡します。<br>砕霊と霊には、霊陣営のみが見える名前の後の}{マークがあります。"
-"role.spirit.doc.sb" : "<b>還霊</b><br>他者を霊に変え、自身は砕霊になる"
-"options.role.spirit.KillCoolDown" : "キルクールタイム"
-"options.role.spirit.KillMaxUses" : "最大キル回数"
-"options.role.spirit.SoulBack" : "還霊使用可能"
-"button.label.spirit.kill" : "霊撃"
-"button.label.spirit.sb" : "還霊"
-
-"role.brokenspirit.name" : "「砕霊」"
-"role.brokenspirit.short" : "砕"
-"role.brokenspirit.blurb" : "壊れかけた「魂」"
-"role.brokenspirit.doc" : "砕霊は霊が還霊を使った後に生まれる役職で、通常のキルスキルを持ち、回数はホスト設定によります。<br>霊が死亡すると、すべての砕霊が死亡します。<br>霊と砕霊の名前の後には、この陣営のみが見られる}{マークがあります。"
-"options.role.brokenspirit.detail" : "砕霊は霊が還霊を使用した後に生まれる役職です。<br><b>これは Half Sugar からのプレゼントの一つです！</b>"
-
-
-
-#附加
-
 "role.blitz.name" : "ブリッツ"
 "role.blitz.short" : "%"
 "role.blitz.generalBlurb" : "進撃！"
 "options.role.blitz.detail" : "ゲーム開始時または会議終了後、<br>あなたの<b>2回目</b>のキルクールダウンが即座に<b><color=#FF0000>0秒</color></b>にリセットされ、<br>即座に一度攻撃を仕掛けることができます。<br><b>これはバンタンからのプレゼントの一つです！</b>"
 "role.blitz.doc" : "会議終了後またはゲーム開始時ごとに、あなたのキルクールダウンが即座に<b><color=#FF0000>0秒</color></b>にリセットされます。"
-
-
-"role.imagimodi.name" : "想像力"
-"role.imagimodi.generalBlurb" : "豊かな想像"
-"role.imagimodi.doc" : "<b>想像力</b>のメイン職業を参照してください。"
-
 "role.keymaster.name" : "キーマスター"
 "role.keymaster.generalBlurb" : "開けゴマ"
 "role.keymaster.doc" : "<b>SKELD</b>と<b>MIRAHQ</b>以外のすべてのドアを直接開けることができます。"
 "options.role.keymaster.detail" : "ドアを直接開けられる"
 "options.modifier.keymaster.cooldown" : "ドア開閉クールダウン"
 "button.label.keymaster.open" : "ドアを開ける"
-
-
-#死因
-
 "state.imaginationDepression" : "鬱"
 "state.partyAccident" : "舞踏会事故"
 "state.brokewish" : "砕願"
-"state.sanling" : "散霊"
-"state.soulback" : "魂帰"
-
-#阵营
-"teams.Havenger" : "尋仇者"
-"HavengerWin" : "尋仇者の勝利"
-"teams.spirit" : "霊"
-"spiritWin" : "霊の勝利"

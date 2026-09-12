@@ -81,23 +81,24 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
 
     public RuntimeRole CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
 
-    static RemoteProcess<byte> RpcFlash = new("RpcFlash", (targetId, _) =>
+    static RemoteProcess<byte> RpcFlash = new("HSG.Snitch.Flash", (targetId, _) =>
     {
         if (GamePlayer.GetPlayer(targetId)?.AmOwner == true)
             AmongUsUtil.PlayQuickFlash(Cor.green);
     });
 
-    static RemoteProcess<byte> RpcFlashRed = new("RpcFlashRed", (targetId, _) =>
+    static RemoteProcess<byte> RpcFlashRed = new("HSG.Snitch.FlashRed", (targetId, _) =>
     {
         if (GamePlayer.GetPlayer(targetId)?.AmOwner == true)
             AmongUsUtil.PlayQuickFlash(Cor.impRed);
     });
 
-    static RemoteProcess<byte> RpcCreateArrowToSnitch = new("RpcCreateArrowToSnitch", (targetId, _) =>
+    // 显式传入告密者 id：多名告密者同时存在时，用 FirstOrDefault 会指向错误的人
+    static RemoteProcess<(byte snitchId, byte targetId)> RpcCreateArrowToSnitch = new("HSG.Snitch.ArrowToSnitch", (msg, _) =>
     {
-        var target = GamePlayer.GetPlayer(targetId);
-        var snitch = GamePlayer.AllPlayers.FirstOrDefault(p => p.Role is Snitch.Instance);
-        if (snitch != null && target != null && target.AmOwner)
+        var target = GamePlayer.GetPlayer(msg.targetId);
+        var snitch = GamePlayer.GetPlayer(msg.snitchId);
+        if (snitch != null && snitch.Role is Instance && target != null && target.AmOwner)
         {
             var arrow = new TrackingArrowAbility(snitch, 0f, Virial.Color.Green, false);
             arrow.Register(snitch.Role as Instance);
@@ -106,7 +107,7 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
         }
     });
 
-    static RemoteProcess<(byte snitchId, byte targetId)> RpcCreateRedArrow = new("RpcCreateRedArrow", (msg, _) =>
+    static RemoteProcess<(byte snitchId, byte targetId)> RpcCreateRedArrow = new("HSG.Snitch.RedArrow", (msg, _) =>
     {
         var snitch = GamePlayer.GetPlayer(msg.snitchId);
         var target = GamePlayer.GetPlayer(msg.targetId);
@@ -148,13 +149,7 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
             arrowsPointingToSnitch[owner.PlayerId].Add(arrow);
         }
 
-        void RuntimeAssignable.OnActivated()
-        {
-            if (AmOwner && !AmOwner)
-            {
-                throw new Exception("你这黑客。");
-            }
-        }
+        void RuntimeAssignable.OnActivated() { }
 
         [Local]
         void SetTask(PlayerTasksTrySetLocalEvent ev)
@@ -212,7 +207,7 @@ public class Snitch : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignable
             foreach (var target in targets)
             {
                 RpcFlash.Invoke(target.PlayerId);
-                RpcCreateArrowToSnitch.Invoke(target.PlayerId);
+                RpcCreateArrowToSnitch.Invoke((MyPlayer.PlayerId, target.PlayerId));
             }
         }
 

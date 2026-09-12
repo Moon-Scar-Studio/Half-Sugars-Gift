@@ -37,8 +37,24 @@ public static class PropHuntInput
         // 会议中不处理。
         if (MeetingHud.Instance != null) return true;
 
+        // 正在看队友视角。
+        if (PropHuntSpectator.IsWatching)
+        {
+            // C 在这个模式里本来就是「变回」，观察期间复用成「回到自己的视角」很自然。
+            // 这条路径不依赖 Nebula 的键位配置，是按钮子操作键之外的保底出口。
+            if (Input.GetKeyDown(KeyCode.C)) PropHuntSpectator.StopByPlayer();
+
+            // 其余变身相关按键一律挡掉 —— 否则会出现「盯着队友的画面，
+            // 却把自己在另一头变了形」这种完全看不懂的情况。
+            return true;
+        }
+
         // --- C：变回船员 ---
-        if (Input.GetKeyDown(KeyCode.C) && PropManager.IsDisguised(local.PlayerId))
+        // PropHuntSpectator.JustStopped：这一帧刚用 C 退出过观察，
+        // 那次按键已经被消费掉了，不能再拿它把自己变回原形。详见该属性的注释。
+        if (Input.GetKeyDown(KeyCode.C)
+            && !PropHuntSpectator.JustStopped
+            && PropManager.IsDisguised(local.PlayerId))
         {
             PropManager.RevertLocal();
             local.Visible = true;

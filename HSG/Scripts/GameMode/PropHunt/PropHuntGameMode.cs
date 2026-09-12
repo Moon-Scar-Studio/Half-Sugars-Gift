@@ -85,6 +85,9 @@ public class PropHuntRoleAllocator : IRoleAllocator
                     : Nebula.Roles.Crewmate.Crewmate.MyRole);
         }
 
+        // 记录开局抓捕者名单，供 PropHuntState 的相关演出与判定使用
+        PropHuntState.SetSeekersOnAssign(seekers);
+
         table.Determine();
     }
 }
@@ -204,8 +207,10 @@ public static class PropHuntGameEnds
 
     public static void Preprocess(NebulaPreprocessor preprocessor)
     {
-        SeekerWin = NebulaAPI.Preprocessor!.CreateEnd("end.hsg.propHunt.seekerWin", Cor.impRed, 100);
-        PropWin = NebulaAPI.Preprocessor!.CreateEnd("end.hsg.propHunt.propWin", Cor.cyan, 100);
+        // CreateEnd 内部会自动给翻译键加 "end." 前缀（见 NebulaAPI GameEnd 构造函数），
+        // 这里传不带前缀的名字，语言文件里写 "end.hsg.propHunt.xxx" 即可
+        SeekerWin = NebulaAPI.Preprocessor!.CreateEnd("hsg.propHunt.seekerWin", Cor.impRed, 100);
+        PropWin = NebulaAPI.Preprocessor!.CreateEnd("hsg.propHunt.propWin", Cor.cyan, 100);
     }
 }
 

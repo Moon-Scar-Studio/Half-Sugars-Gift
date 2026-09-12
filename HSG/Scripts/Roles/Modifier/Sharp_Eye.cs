@@ -13,7 +13,6 @@ public class Sharp_Eye : DefinedAllocatableModifierTemplate,
         new IConfiguration[] { }
     )
     { }
-    static bool _GameStarted = false;
     public static Sharp_Eye MyRole = new();
 
     public Citation Citation => Citations.hvtXsvc_hsg;
@@ -29,20 +28,17 @@ public class Sharp_Eye : DefinedAllocatableModifierTemplate,
 
         DefinedModifier RuntimeModifier.Modifier => (DefinedModifier)MyRole;
 
-        void RuntimeAssignable.OnActivated()
-        {
-            if (!AmOwner) return;
-        }
-        [OnlyHost]
-        void OnGameStarted(GameStartEvent ev)
-        {
-            _GameStarted = true;
-        }
+        // 原实现用 [OnlyHost] 置一个静态标记，非房主持有者永远不会闪光；改为实例内标记
+        bool _gameStarted = false;
+
+        void RuntimeAssignable.OnActivated() { }
+
+        void OnGameStarted(GameStartEvent ev) => _gameStarted = true;
+
         [Local]
         void RoleChange(PlayerRoleSetEvent ev)
         {
-            if (!_GameStarted) return;
-            if (!AmOwner) return;
+            if (!_gameStarted) return;
             AmongUsUtil.PlayQuickFlash(Cor.blue);
         }
         void RuntimeAssignable.DecorateNameConstantly(ref string name, bool canSeeAllInfo, bool inEndScene)

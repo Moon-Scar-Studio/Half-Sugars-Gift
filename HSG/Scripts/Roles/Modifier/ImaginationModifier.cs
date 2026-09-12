@@ -33,27 +33,17 @@ namespace NebulaN.Roles.Modifier
             [Local]
             void OnMeetingEnd(MeetingEndEvent ev)
             {
+                if (MyPlayer.IsDead) return;
                 OpenSelectGUI();
             }
+
             void OpenSelectGUI(bool showCloseButton = false)
             {
-                var myPlayer = MyPlayer;
-                var allRoles = Nebula.Roles.Roles.AllRoles ?? new List<DefinedRole>();
-                var selectedRoles = Imagination.GetSelectedRoles();
-
-                var candidateRoles = allRoles
-                    .Where(r =>
-                        !r.IsSystemRole &&
-                        (r.Category == RoleCategory.CrewmateRole ||
-                         r.Category == RoleCategory.ImpostorRole) &&
-                        !selectedRoles.Contains(r)
-                    )
-                    .OrderBy(_ => Guid.NewGuid())
-                    .Take(Imagination.CandidateCount)
-                    .ToList();
+                var candidateRoles = Imagination.CollectCandidates();
                 if (candidateRoles.Count == 0)
                 {
                     MyPlayer.Suicide(State.Depression, null, KillParameter.NormalKill, null);
+                    return;
                 }
                 var tabs = new (string? tab, Predicate<DefinedRole>? predicate)[]
                 {
@@ -69,13 +59,8 @@ namespace NebulaN.Roles.Modifier
                     (DefinedRole selectedRole) =>
                     {
                         Imagination.GetSelectedRoles().Add(selectedRole);
-
                         result?.CloseScreen();
-
-                        MyPlayer.SetRole(
-                            selectedRole,
-                            selectedRole.DefaultAssignableArguments ?? []
-                        );
+                        MyPlayer.SetRole(selectedRole, selectedRole.DefaultAssignableArguments ?? []);
                     },
                     ref result,
                     showCloseButton
@@ -86,11 +71,13 @@ namespace NebulaN.Roles.Modifier
             void OnCheckWin(PlayerCheckWinEvent ev)
             {
                 if (ev.GameEnd != HalfSugarGift.Core.Patch.Team.ImaginationWin) return;
-                ev.SetWinIf(
-                    !MyPlayer.IsDead &&
-                    !NebulaGameManager.Instance!.AllPlayerInfo.Any(p => !p.IsDead && p.Role.Role.IsKiller)
-                );
+                ev.SetWinIf(Imagination.CanWin(MyPlayer));
             }
+
+            // 转职后想象力本体的角色实例已被释放，胜利覆盖逻辑必须在修饰符上继续存在
+            [OnlyHost]
+            void OnEndCriteriaMet(EndCriteriaMetEvent ev) => Imagination.TryOverwriteWin(ev, MyPlayer);
+
             string RuntimeAssignable.OverrideRoleName(string lastRoleName, bool isShort, bool canSeeAllInfo)
             {
                 if (canSeeAllInfo || AmOwner)

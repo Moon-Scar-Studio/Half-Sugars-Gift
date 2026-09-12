@@ -58,7 +58,7 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
     RuntimeRole RuntimeAssignableGenerator<RuntimeRole>.CreateInstance(GamePlayer player, int[] arguments) => new Instance(player);
 
     Virial.Media.Image? DefinedAssignable.IconImage =>
-        NebulaAPI.AddonAsset.GetResource("Smallicon/MageIcon.png")?.AsImage();
+        NebulaAPI.AddonAsset.GetResource("Smallicon/RestorerIcon.png")?.AsImage();
 
     // 文档用技能图标
     internal static readonly Virial.Media.Image? WeakIcon =
@@ -109,15 +109,8 @@ public class Mage : DefinedRoleTemplate, DefinedRole, HasCitation,
         private ModAbilityButton? _restoreButton;
 
         // === 通过反射获取 UnknownOutfit（隐蔽者同款伪装外观） ===
-        private static OutfitDefinition? GetUnknownOutfit()
-        {
-            var game = NebulaAPI.CurrentGame;
-            if (game == null) return null;
-            var prop = game.GetType().GetProperty("UnknownOutfit",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            return prop?.GetValue(game) as OutfitDefinition;
-
-        }
+        // UseHiddenMembers 已开启，直接访问 Nebula 内部成员即可，不需要反射
+        private static OutfitDefinition? GetUnknownOutfit() => NebulaGameManager.Instance?.UnknownOutfit;
 
         public Instance(GamePlayer player) : base(player) { }
 

@@ -160,10 +160,13 @@ public class MaskedDancer : DefinedRoleTemplate, HasCitation, DefinedRole,
                     }
                 }
 
+                // 成就：CustomAchievement.dat 里声明了 maskedDancer.* 三个成就，但此前没有任何代码触发它们
+                new StaticAchievementToken("maskedDancer.party");
                 if (a == 1 && b == 1 && c == 1)
                 {
                     var target = InvitePlayers[UnityEngine.Random.Range(0, InvitePlayers.Count)];
                     target.Suicide(State.PartyAccident, null, KillParameter.NormalKill, null);
+                    new StaticAchievementToken("maskedDancer.accident");
                 }
                 else if (a == 3) {/*喵。*/}
                 else if (a == 2)
@@ -173,6 +176,7 @@ public class MaskedDancer : DefinedRoleTemplate, HasCitation, DefinedRole,
                         if (p.Role.Role.Category != RoleCategory.CrewmateRole)
                         {
                             p.Suicide(State.PartyAccident, null, KillParameter.NormalKill, null);
+                            new StaticAchievementToken("maskedDancer.accident");
                             break;
                         }
                     }
@@ -180,11 +184,13 @@ public class MaskedDancer : DefinedRoleTemplate, HasCitation, DefinedRole,
                 else if (a == 0)
                 {
                     MyPlayer.Suicide(State.PartyAccident, null, KillParameter.NormalKill, null);
+                    new StaticAchievementToken("maskedDancer.suicide");
                 }
                 else
                 {
                     var target = InvitePlayers[UnityEngine.Random.Range(0, InvitePlayers.Count)];
                     target.Suicide(State.PartyAccident, null, KillParameter.NormalKill, null);
+                    new StaticAchievementToken("maskedDancer.accident");
                 }
                 foreach (var icon in invitedIcons)
                     if (icon) GameObject.Destroy(icon.gameObject);

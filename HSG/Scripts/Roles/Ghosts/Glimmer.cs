@@ -38,7 +38,7 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
         new[] { "options.role.glimmer.flashcolor.red", "options.role.glimmer.flashcolor.yellow", "options.role.glimmer.flashcolor.cyan", "options.role.glimmer.flashcolor.green", "options.role.glimmer.flashcolor.blue", "options.role.glimmer.flashcolor.purple", "options.role.glimmer.flashcolor.wishY","options.role.glimmer.flashcolor.followtarget" }
         , 0
         );
-    Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/GlimmerIcon")?.AsImage();
+    Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/GlimmerIcon.png")?.AsImage();
     public static readonly Glimmer MyRole = new();
     Citation? HasCitation.Citation => Citations.hvtXsvc_hsg;
     public string CodeName => "GR";
@@ -84,8 +84,7 @@ public class Glimmer : DefinedGhostRoleTemplate, DefinedGhostRole, HasCitation
                     PatchManager.RpcFlashCustom.Invoke((target.PlayerId,ColorHelper.ColorToHexRGB(target.GetPlayerColor()),0.2f,FlashDuration));
                 }
                 left--;
-                if (left > 0)
-                    button.UpdateUsesIcon(left.ToString());
+                button.UpdateUsesIcon(left.ToString());
                 button.StartCoolDown();
             };
         }
