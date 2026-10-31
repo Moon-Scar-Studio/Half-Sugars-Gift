@@ -50,7 +50,8 @@ namespace NebulaN.Roles.Modifier
                     ev.Result = KillResult.Guard;
                     RpcKarmaFlash.Invoke(MyPlayer.PlayerId);
                     if (Karmatic.DeadKillKarma)
-                        ev.Player.MurderPlayer(MyPlayer, PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill);
+                        // 会议中（如被猜测）也要能反弹：默认条件带 InTaskPhase 会被驳回
+                        ev.Player.MurderPlayer(MyPlayer, PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill, KillCondition.BothAlive);
                     else
                         MyPlayer.Suicide(PlayerState.Dead, EventDetail.Kill, KillParameter.NormalKill);
                 }

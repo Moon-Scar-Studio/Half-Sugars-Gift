@@ -149,6 +149,12 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         boostApplied = false;
         ClearArrows();
 
+        // 开局兜底：非房主躲藏者的 moveable 解卡、卡在地图外的落点救援。详见 PropHuntStartGuard。
+        PropHuntStartGuard.Begin();
+
+        // 道具渲染器补挂：PlayerControl 跨局复用，上一局结束时渲染器已被 Clear 销毁。
+        PropManager.AttachAll();
+
         // 全屏演出层（黑幕 + 大号倒计时）要在读取阵营之后装配，
         // GameStartEvent 时角色已经分配完毕，这里是最早的安全点。
         PropHuntOverlay.Setup();
@@ -308,6 +314,7 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
 
         // 这几项不受阶段限制：结算后危险度要归零收起，任务栏文案在死亡后也要能切换，
         // 演出层要负责把黑幕收掉，技能层要负责把相机还给本人、把过期替身清掉。
+        PropHuntStartGuard.Update(ev.DeltaTime);
         PropHuntDangerMeter.Update();
         PropHuntTaskDisplay.Refresh();
         PropHuntOverlay.Update();
@@ -538,13 +545,16 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         var winners = BitMasks.AsPlayer();
         foreach (var player in GamePlayer.AllPlayers.Where(winnerPredicate)) winners.Add(player);
 
-        NebulaGameEnd.RpcSendGameEnd(
-            end,
-            (int)winners.AsRawPattern,
-            0,
-            GameEndReason.Special,
-            end,
-            GameEndReason.Special);
+        // NoS v10：RpcSendGameEnd 改为按「阶段」传元组序列
+        // (winConditionId, winnersMask, extraWinMask, endReason, detail)。
+        // 旧版的 originalWinCondition / originalEndReason 与 end 相同，即没有被覆盖，只需一条阶段。
+        // GameEndDetail 用于结算画面的「胜负理由」面板，这里记录一次胜者阶段即可。
+        var detail = new GameEndDetail();
+        detail.EndPhase(NebulaGameEnd.PhaseCheckWin, winners);
+
+        NebulaGameEnd.RpcSendGameEnd([
+            (end.Id, (int)winners.AsRawPattern, 0ul, GameEndReason.Special, detail)
+        ]);
     }
 
     /// <summary>
@@ -567,6 +577,22 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         ev.Name = ev.Name + " " + Language.Translate("hsg.propHunt.hud.seekerTag");
     }
 
+    /// <summary>
+    /// 任务屏蔽第一层：本机玩家领取任务时清空。
+    ///
+    /// 以前是在 PlayerControl.SetTasks 前缀里直接 Clear 入参列表。那个列表是原版传进来的
+    /// 共享对象（很可能就是 NetworkedPlayerInfo.Tasks 本身），而且前缀对房主上的每一个玩家都会跑，
+    /// 等于把全场所有人的原版任务数据就地抹掉 —— 这会波及原版开局流程里读取任务数据的地方。
+    /// 改用 NoS 公开的 PlayerTasksTrySetLocalEvent：它拿到的是副本，只影响本机要生成的任务实体，
+    /// 网络数据原封不动。沉浸梦想的角斗场用的也是这条路。
+    /// 该事件由 NoS 只对本机玩家触发，不需要再加过滤。
+    /// </summary>
+    void OnTrySetTasks(PlayerTasksTrySetLocalEvent ev)
+    {
+        if (!PropHuntGameModeRegistration.IsPropHuntMode) return;
+        ev.Tasks.Clear();
+    }
+
     void OnGameEnd(GameEndEvent ev)
     {
         ClearArrows();
@@ -576,6 +602,7 @@ public class PropHuntRuntime : AbstractModule<Virial.Game.Game>, IGameOperator
         PropHuntDangerMeter.Teardown();
         PropHuntTaskDisplay.RestoreProgressTracker();
         PropHuntState.Reset();
+        PropHuntStartGuard.Reset();
     }
 
     #endregion

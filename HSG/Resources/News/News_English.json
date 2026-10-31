@@ -1,0 +1,10 @@
+[
+	{
+		"id" : 1,
+		"title" : "Half Sugar's Gift News Test",
+		"shortTitle" : "HSG News Test",
+		"subTitle" : "A sample announcement from Linghan Bingge",
+		"date" : "2026-09-13",
+		"detail" : "This is a sample announcement of <b>Half Sugar's Gift</b>, showing how the news panel works.<br><br>Edit the per-language file under Resources/News in the addon package to add entries. Fields:<br>· <b>id</b>: unique number for each entry<br>· <b>title</b> / <b>shortTitle</b> / <b>subTitle</b>: headline / list label / subtitle<br>· <b>date</b>: written as yyyy-MM-dd, the list is sorted by it in descending order<br>· <b>detail</b>: body text<br>· <b>debug</b>: set to true to show the entry only in debug mode<br><br><b>Body formatting</b><br>Use the br tag for line breaks; real newlines get eaten by the Json parser.<br>Use b and i for bold and italic.<br>Use the color tag, <color=#FFB7DD>like this</color>.<br>Links are written as bracket, url, bracket, visible text, then an empty bracket pair: [https://github.com/Half-Sugar-s-Gift/Half-Sugars-Gift]our repository[].<br>Avoid the size tag; vanilla swallows it along with the text inside.<br><br>Have fun! —— <color=#FFB7DD>Linghan Bingge</color>"
+	}
+]

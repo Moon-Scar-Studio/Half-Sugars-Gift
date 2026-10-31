@@ -7,8 +7,9 @@ namespace HalfSugarGift.GameMode.PropHunt;
 /// 胜负判定已经被 PropHuntRuntime.OnEndCriteriaPreMet 拦住了，
 /// 这里负责把「任务」这件事从玩法和界面上彻底抹掉，一共三层：
 ///
-///   1. PlayerControl.SetTasks 前缀清空列表
+///   1. PropHuntRuntime.OnTrySetTasks（NoS 的 PlayerTasksTrySetLocalEvent）清空本机要生成的任务
 ///      → 不生成任何原版任务实体，控制台按不动，进度条永远不动。
+///      （旧实现是 SetTasks 前缀就地清空入参，会改到原版共享的任务数据，已弃用。）
 ///
 ///   2. 房主开局对所有玩家调 PlayerTaskState.WaiveAllTasksAsOutsider()
 ///      → 第 1 层只挡住了原版任务实体，Nebula 自己的任务状态（Quota / TotalTasks）
@@ -88,14 +89,8 @@ public static class PropHuntTaskDisplay
 
     #region 第一层：清空原版任务列表
 
-    /// <summary>PlayerControl.SetTasks 的前缀。清空入参列表，后续协程就没东西可生成了。</summary>
-    public static void SetTasksPrefix(Il2CppSystem.Collections.Generic.List<NetworkedPlayerInfo.TaskInfo> __0)
-    {
-        if (!PropHuntGameModeRegistration.IsPropHuntMode) return;
-        if (__0 == null) return;
-
-        __0.Clear();
-    }
+    // 已迁移到 PropHuntRuntime.OnTrySetTasks（PlayerTasksTrySetLocalEvent）。
+    // 旧实现是 PlayerControl.SetTasks 前缀里就地 Clear 入参，会连带抹掉原版共享的任务数据。
 
     #endregion
 

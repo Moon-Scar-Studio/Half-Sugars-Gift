@@ -1,0 +1,10 @@
+[
+	{
+		"id" : 1,
+		"title" : "Half Sugar's Gift お知らせテスト",
+		"shortTitle" : "HSG お知らせテスト",
+		"subTitle" : "凌寒冰歌からのサンプルのお知らせ",
+		"date" : "2026-09-13",
+		"detail" : "これは <b>Half Sugar's Gift</b> のサンプルのお知らせです。<br><br>アドオン内の Resources/News にある言語別のファイルを編集すると、お知らせを追加できます。項目：<br>· <b>id</b>：お知らせの番号。重複しないように<br>· <b>title</b> / <b>shortTitle</b> / <b>subTitle</b>：見出し / 一覧用の短い見出し / サブタイトル<br>· <b>date</b>：日付。yyyy-MM-dd 形式で統一。一覧はこの順で降順に並びます<br>· <b>detail</b>：本文<br>· <b>debug</b>：true にするとデバッグモードでのみ表示<br><br><b>本文の書き方</b><br>改行は br タグで。実際の改行は Json パーサーに消されます。<br>太字と斜体は b と i タグ。<br>色は color タグで <color=#FFB7DD>このように</color>。<br>リンクは「角括弧・URL・角括弧・表示テキスト・空の角括弧」の順に書きます：[https://github.com/Half-Sugar-s-Gift/Half-Sugars-Gift]リポジトリ[]。<br>size タグは使わないでください。中の文字ごとバニラに飲み込まれます。<br><br>それでは楽しんでください —— <color=#FFB7DD>凌寒冰歌</color>"
+	}
+]

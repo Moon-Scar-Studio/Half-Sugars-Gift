@@ -45,6 +45,34 @@ public static class PropManager
         PlayerToProp[player.PlayerId] = renderer;
     }
 
+    /// <summary>
+    /// 给场上所有玩家补挂道具渲染器。开局时调用。
+    ///
+    /// 只靠 PlayerControl.Start 挂载是不够的：PlayerControl 在大厅和对局之间是复用的，
+    /// Start 只在玩家对象生成时跑一次，而 <see cref="Clear"/> 会在每局结束时把渲染器全部销毁。
+    /// 结果是第二局开始所有人都没有渲染器，R 键变身静默失败。
+    /// </summary>
+    public static void AttachAll()
+    {
+        foreach (var player in PlayerControl.AllPlayerControls.GetFastEnumerator())
+        {
+            if (player != null) Attach(player);
+        }
+    }
+
+    /// <summary>取渲染器，没有就当场补挂一个。RPC 与本地操作都走这里，避免某一端漏挂导致不同步。</summary>
+    private static SpriteRenderer? GetOrAttach(byte playerId)
+    {
+        var renderer = Get(playerId);
+        if (renderer != null) return renderer;
+
+        var control = Helpers.GetPlayer(playerId);
+        if (control == null) return null;
+
+        Attach(control);
+        return Get(playerId);
+    }
+
     /// <summary>移除某个玩家的道具渲染器。</summary>
     public static void Detach(byte playerId)
     {
@@ -105,7 +133,7 @@ public static class PropManager
     public static readonly RemoteProcess<(byte playerId, int consoleIndex)> RpcPropSync =
         new("HSG_PropHuntPropSync", (message, _) =>
         {
-            var renderer = Get(message.playerId);
+            var renderer = GetOrAttach(message.playerId);
             if (renderer == null) return;
 
             var ship = ShipStatus.Instance;
@@ -131,7 +159,7 @@ public static class PropManager
     public static readonly RemoteProcess<(byte playerId, float x, float y)> RpcPropPos =
         new("HSG_PropHuntPropPos", (message, _) =>
         {
-            var renderer = Get(message.playerId);
+            var renderer = GetOrAttach(message.playerId);
             if (renderer == null) return;
             renderer.transform.localPosition = new Vector3(message.x, message.y, PropZOffset);
         });

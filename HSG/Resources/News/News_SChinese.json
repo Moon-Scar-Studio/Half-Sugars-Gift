@@ -1,0 +1,10 @@
+[
+	{
+		"id" : 1,
+		"title" : "Half Sugar's Gift 公告测试",
+		"shortTitle" : "HSG 公告测试",
+		"subTitle" : "这是一条来自凌寒冰歌的示例公告",
+		"date" : "2026-09-13",
+		"detail" : "这是 <b>Half Sugar's Gift</b> 的示例公告，用来演示公告栏功能。<br><br>在插件包内的 Resources/News 目录下按语言修改对应文件即可新增公告。字段：<br>· <b>id</b>：公告序号，不同公告不要重复<br>· <b>title</b> / <b>shortTitle</b> / <b>subTitle</b>：大标题 / 列表短标题 / 副标题<br>· <b>date</b>：日期，统一写成 yyyy-MM-dd，列表按它倒序排列<br>· <b>detail</b>：正文<br>· <b>debug</b>：填 true 时只在调试模式下可见<br><br><b>正文写法</b><br>换行用 br 标签，真实换行会被 Json 解析器吃掉。<br>粗体斜体用 b 和 i 标签。<br>颜色用 color 标签，比如 <color=#FFB7DD>这样</color>。<br>链接写成「左方括号 网址 右方括号 显示文字 一对空方括号」，像这样：[https://github.com/Half-Sugar-s-Gift/Half-Sugars-Gift]我们的仓库[]。<br>不要使用 size 标签，原版会把它连同里面的文字一起吞掉。<br><br>祝你玩得开心 —— <color=#FFB7DD>凌寒冰歌</color>"
+	}
+]

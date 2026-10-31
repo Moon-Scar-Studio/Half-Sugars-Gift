@@ -48,17 +48,18 @@ public static class PropHuntHarmony
             prefix: typeof(PropHuntInput).GetMethod(nameof(PropHuntInput.KeyboardUpdatePrefix)));
 
         // --- 任务屏蔽 ---
-        // PlayerControl 上只有一个 SetTasks 重载（另一个 SetTasks 在 NetworkedPlayerInfo 上，
-        // 不是同一个类），所以按名字取方法不会抛 AmbiguousMatchException。
-        Patch(harmony, typeof(PlayerControl), nameof(PlayerControl.SetTasks),
-            prefix: typeof(PropHuntTaskDisplay).GetMethod(nameof(PropHuntTaskDisplay.SetTasksPrefix)),
-            prefixPriority: Priority.First);
+        // 原先这里给 PlayerControl.SetTasks 挂了一个就地清空入参列表的前缀。
+        // 已改为 PropHuntRuntime.OnTrySetTasks（NoS 的 PlayerTasksTrySetLocalEvent），
+        // 不再改动原版共享的任务数据。理由见该方法的注释。
 
         // 任务栏文案。Harmony 的 postfix 高优先级后执行：Priority.First 保证
         // 在 Nebula 自己的 TaskTextPatch（默认优先级）之后写入，不被它覆盖。
         Patch(harmony, typeof(TaskPanelBehaviour), nameof(TaskPanelBehaviour.SetTaskText),
             postfix: typeof(PropHuntTaskDisplay).GetMethod(nameof(PropHuntTaskDisplay.SetTaskTextPostfix)),
             postfixPriority: Priority.First);
+
+        // 会议 / 报告 / 破坏（含关门与修复）的限制，详见 PropHuntRestrictions。
+        PropHuntRestrictions.Apply(harmony);
 
         HsgDebug.Log("[HSG] 道具躲猫猫补丁应用完成。");
     }
@@ -111,6 +112,7 @@ public static class PropHuntHarmony
         PropHuntDangerMeter.Teardown();
         PropHuntTaskDisplay.RestoreProgressTracker();
         PropHuntState.Reset();
+        PropHuntStartGuard.Reset();
     }
 
     /// <summary>玩家死亡时移除其道具。对应原版 OnPlayerDiePatch。</summary>
@@ -256,8 +258,11 @@ public static class PropHuntHarmony
 #region 屏蔽会议
 
 /// <summary>
-/// 躲猫猫没有会议。屏蔽紧急按钮。
+/// 躲猫猫没有会议。紧急按钮小游戏里显示「本模式没有会议」。
 /// 原版靠原版躲猫猫本身就没有会议流程，Nebula 这边要自己挡。
+///
+/// 注意这个事件只负责紧急按钮面板上的提示文字；真正的拦截
+/// （报告、紧急会议、破坏、修复）在 PropHuntRestrictions 里按界面 / 本机 / 房主三层完成。
 /// </summary>
 [NebulaPreprocess(PreprocessPhase.PostLoadAddons)]
 public class PropHuntMeetingBlocker : AbstractModule<Virial.Game.Game>, IGameOperator
