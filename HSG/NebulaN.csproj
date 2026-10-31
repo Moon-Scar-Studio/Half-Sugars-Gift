@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -16,12 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Scripts\Core\API\**" />
-    <EmbeddedResource Remove="Scripts\Core\API\**" />
-    <None Remove="Scripts\Core\API\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
   </ItemGroup>
@@ -36,12 +30,22 @@
 		</ItemGroup>
 	</Target>
 	<ItemGroup>
-		<PackageReference Include="Krafs.Publicizer" Version="1.0.3">
+		<PackageReference Include="Krafs.Publicizer" Version="2.3.2" GeneratePathProperty="true">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<Publicize Include="Nebula" />
-		<Publicize Include="NebulaAPI" />
+		<!-- Publicizer 自带的 IgnoresAccessChecksToAttribute 是 internal，和 MonoMod.Utils 中的同名 public 类型
+		     同时参与编译会触发 CS0436。这里移除 Publicizer 的源文件，改用 MonoMod.Utils 提供的同名属性。 -->
+		<Compile Remove="$(PkgKrafs_Publicizer)\contentfiles\cs\any\Publicizer\IgnoresAccessChecksToAttribute.cs" />
+		<Publicize Include="Nebula"/>
+		<Publicize Include="NebulaAPI"/>
+		<!-- 基类的 OnInjected 是 protected virtual，Publicizer 默认会把 virtual 成员改成 public，
+		     导致子类里 protected override 触发 CS0507。这里让 Publicizer 保留其原始访问级别。 -->
+		<DoNotPublicize Include="NebulaAPI:Virial.DI.AbstractModule`1.OnInjected" />
+		<!--
+		<DoNotPublicize Include="Nebula:你的命名空间.MoreVoteSettings" />
+		<DoNotPublicize Include="Nebula:你的命名空间.HsgChatModule" />
+		<DoNotPublicize Include="Nebula:你的命名空间.RandomEventSettings" />-->
 	</ItemGroup>
 	<PropertyGroup>
 		<NoWarn>$(NoWarn);CS0507</NoWarn>
