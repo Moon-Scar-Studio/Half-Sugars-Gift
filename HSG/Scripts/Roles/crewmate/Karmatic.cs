@@ -28,7 +28,7 @@ namespace NebulaN.Roles.Crewmate
             [CausalityChainCoolDown, FollowTime, CausalityChainMaxUses, EraseKarmaMeetingTimes, DeadKillKarma,NameDeco, NeedImp]
             )
         {
-
+            
         }
         Image? DefinedAssignable.IconImage => NebulaAPI.AddonAsset.GetResource("Smallicon/KarmaticIcon.png").AsImage(); 
         public Citation Citation => Citations.hvtXsvc_hsg;

@@ -588,6 +588,48 @@ public static partial class PatchManager
         );
     }
 
+    private static bool _lobbyWelcomeInitialized;
+
+    /// <summary>
+    /// 大厅欢迎消息。参考 FairyStarFlight 的 fsf.lobby.welcome：
+    /// 在 <see cref="LobbyBehaviour.Start"/> 之后延迟 1.5 秒发送，等待聊天框初始化完成。
+    /// </summary>
+    private static void InitializeLobbyWelcome()
+    {
+        if (_lobbyWelcomeInitialized) return;
+        _lobbyWelcomeInitialized = true;
+
+        try
+        {
+            var harmony = new Harmony("HSG.LobbyWelcome");
+            harmony.Patch(
+                original: typeof(LobbyBehaviour).GetMethod(nameof(LobbyBehaviour.Start)),
+                postfix: new HarmonyMethod(typeof(PatchManager).GetMethod(nameof(OnLobbyStart), BindingFlags.Static | BindingFlags.NonPublic))
+            );
+            HsgDebug.Log("[HSG] LobbyStart 欢迎消息补丁已挂载");
+        }
+        catch (Exception e)
+        {
+            HsgDebug.LogException("[HSG] LobbyStart 欢迎消息补丁挂载失败", e);
+        }
+    }
+
+    private static void OnLobbyStart()
+    {
+        if (NebulaManager.Instance == null) return;
+
+        NebulaManager.Instance.StartDelayAction(1.5f, () =>
+        {
+            if (LobbyBehaviour.Instance == null) return;
+            if (PlayerControl.LocalPlayer == null) return;
+            if (HudManager.Instance == null || HudManager.Instance.Chat == null) return;
+
+            string welcome = Language.Translate("hsg.goodbye");
+            SendHsgMessage(welcome.Replace("<br>", "\n"));
+                
+        });
+    }
+
     /// <summary>本地玩家当前是否被禁言。</summary>
     internal static bool IsLocalMuted()
     {
@@ -790,7 +832,14 @@ public static partial class PatchManager
         HudManager.Instance.Chat.AddChat(pc, msg);
         pc.SetName(orig);
     }
-
+    public static void SendHsgMessage(string msg)
+    {
+        var pc = PlayerControl.LocalPlayer;
+        string orig = pc.name;
+        pc.SetName("<color=#F5D76E>Half</color> <color=#FFD700>Sugar's</color> <color=#D4AF37>Gift</color>");
+        HudManager.Instance.Chat.AddChat(pc, msg);
+        pc.SetName(orig);
+    }
     public static void SendLocalNotification(string msg)
     {
         var notifier = HudManager.Instance.Notifier;
@@ -859,6 +908,7 @@ public static partial class PatchManager
     {
         LoadSettings();
         Initialize();
+        InitializeLobbyWelcome();
     }
     public static void Preprocess(NebulaPreprocessor preprocessor)
     {

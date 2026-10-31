@@ -1,4 +1,4 @@
-﻿# Half Sugar's Gift - 简体中文
+﻿# Half Sugar's Gift
 "gamemode.hsg.cowboyDuel" : "赏金之争"
 "gamemode.hsg.propHunt" : "道具躲猫猫"
 "task.hsg.cowboyDuel.name" : "组装枪械"
@@ -450,7 +450,6 @@
 "achievement.maskedDancer.suicide.title" : "碎裂的假面"
 "achievement.maskedDancer.suicide.goal" : "假面舞者在舞会中死亡。"
 
-# ==== 星云创意表新增职业 / Roles added from the idea sheet ====
 "role.forbiddenLove.name" : "禁忌之恋"
 "role.forbiddenLove.short" : "恋"
 "role.forbiddenLove.blurb" : "我会陪伴你到最后一刻的"
@@ -801,7 +800,6 @@
 "options.role.workaholic.detail" : "加班狂只能不停做任务来续命。"
 "options.modifier.workaholic.detail" : "加班狂只能不停做任务来续命。"
 
-# ---- 选项 / Options ----
 "options.modifier.forbiddenLove.chance" : "出现概率"
 "options.modifier.forbiddenLove.hasShield" : "自带一次护盾"
 "options.modifier.forbiddenLove.numOfPairs" : "链子对数"
@@ -894,7 +892,6 @@
 "options.role.wrecker.floor" : "冷却下限"
 "options.role.wrecker.step" : "每档减少的冷却"
 
-# ---- 按钮 / Buttons ----
 "button.label.agent007.plant" : "埋下伏笔"
 "agent007.plant" : "埋下伏笔"
 "button.label.anesthetist.shot" : "麻醉"
@@ -954,7 +951,6 @@
 "button.label.wraith.possess" : "附身"
 "wraith.possess" : "附身"
 
-# ---- 阵营 / 结算 / 死因 ----
 "teams.artist" : "画师"
 "teams.boss" : "老板"
 "teams.caterpillar" : "猫猫虫"
@@ -1019,7 +1015,6 @@
 "role.vindicator.noButton" : "易怒状态下无法召集会议"
 "role.workaholic.salary" : "工资 %NUM%"
 
-# ---- 成就 / Achievements ----
 "achievement.agent007.plant.title" : "稍安勿躁"
 "achievement.agent007.plant.goal" : "埋下一次伏笔"
 "achievement.agent007.silent.title" : "静谧无声"
@@ -1154,7 +1149,6 @@
 "achievement.wrecker.kingOfKings.goal" : "把冷却压到下限"
 
 
-# ---- 豆腐狂热者（对接本家妖狐 Spectre） ----
 "options.role.tofuLover.initialSatiety" : "初始饥饿值"
 "options.role.tofuLover.maxSatiety" : "饥饿值上限"
 "options.role.tofuLover.vanishCost" : "消失消耗的饥饿值"
@@ -1164,7 +1158,6 @@
 "achievement.tofuLover.win.title" : "我是豆腐脑！"
 "achievement.tofuLover.win.goal" : "获得游戏胜利"
 
-# ---- 救命恩人：洞察（对接本家末日预言家）与标记 ----
 "options.role.savior.oracleCandidates" : "洞察的候选职业数"
 "options.role.savior.oracleUses" : "洞察次数"
 "options.role.savior.oracleCooldown" : "洞察冷却"
@@ -1180,3 +1173,5 @@
 "achievement.savior.mark.goal" : "标记一名玩家的职业"
 "button.label.savior.insight" : "洞察"
 "savior.insight" : "洞察"
+
+"hsg.goodbye" : "感谢您使用 Half Sugar's Gift！<br>本插件已于2026.10.31日停更并归档，感谢您一直以来的支持！<br>感谢所有开发者以及美术人员对本插件做出的贡献。<br>Fin. 2026.5.10 - 2026.10.31"
