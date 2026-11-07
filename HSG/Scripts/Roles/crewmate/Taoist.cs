@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HalfSugarGift.Roles.Crewmate;
-
+// 道士重置版，在1.99更新后也没成功出生。
+// 让我们为他悼念。
 public class Taoist : DefinedRoleTemplate, HasCitation, DefinedRole, IAssignableDocument
 {
     public Taoist():base(

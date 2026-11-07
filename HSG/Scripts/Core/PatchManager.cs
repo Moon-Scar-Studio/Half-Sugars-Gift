@@ -590,10 +590,6 @@ public static partial class PatchManager
 
     private static bool _lobbyWelcomeInitialized;
 
-    /// <summary>
-    /// 大厅欢迎消息。参考 FairyStarFlight 的 fsf.lobby.welcome：
-    /// 在 <see cref="LobbyBehaviour.Start"/> 之后延迟 1.5 秒发送，等待聊天框初始化完成。
-    /// </summary>
     private static void InitializeLobbyWelcome()
     {
         if (_lobbyWelcomeInitialized) return;
@@ -1133,11 +1129,15 @@ public class HsgChatModule : AbstractModule<Game>, IGameOperator
     protected override void OnInjected(Game container)
     {
         PatchManager.ResetMuteState();
+        NebulaN.Core.KarmaVisualManager.Clear();
         this.Register(container);
     }
 
     // 会议结束：解除"到会议结束为止"的禁言
     void OnMeetingEnd(MeetingEndEvent ev) => PatchManager._mutedInMeeting.Clear();
+
+    // 游戏结束：清掉本局残留的 Karma 标记
+    void OnGameEnd(GameEndEvent ev) => NebulaN.Core.KarmaVisualManager.Clear();
 
     // 禁言解除提示
     void OnUpdate(GameUpdateEvent ev)

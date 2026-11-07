@@ -61,6 +61,7 @@ namespace NebulaN.Roles.Crewmate
             ModAbilityButton CausalityChain;
             GamePlayer TargetPlayer;
             bool HasTarget = false;
+            int karmaMeetingsLeft;
             void RuntimeAssignable.OnActivated()
             {
                 if (!AmOwner) return;
@@ -86,6 +87,7 @@ namespace NebulaN.Roles.Crewmate
                     {
                         TargetPlayer = target;
                         HasTarget = true;
+                        UsesLeft--;
                     }
                     button.StartCoolDown();
                     button.UpdateUsesIcon(UsesLeft.ToString());
@@ -98,18 +100,59 @@ namespace NebulaN.Roles.Crewmate
                 };
                 
             }
+            /// <summary>清掉当前业力目标：停止名字装饰、销毁标记，并让技能重新可用。</summary>
+            void ClearKarmaTarget()
+            {
+                if (TargetPlayer != null)
+                    KarmaVisualManager.RemoveKarmaVisual(TargetPlayer.PlayerId);
+                TargetPlayer = null;
+                HasTarget = false;
+                karmaMeetingsLeft = 0;
+            }
+
             [Local]
             void AddKarma(MeetingEndEvent ev)
             {
                 if (!HasTarget) return;
-                if (TargetPlayer == null) return;
+                if (TargetPlayer == null || TargetPlayer.VanillaPlayer == null || TargetPlayer.IsDead)
+                {
+                    ClearKarmaTarget();
+                    return;
+                }
+
+                // AddKarma 每个会议结束都会触发。修正体已经附上时只能补标记，
+                // 不能再次 AddModifier，否则会重置 Karma 自己的 EraseSelfModiCounts，导致它永远清不掉。
+                if (TargetPlayer.TryGetModifier<Karma.Instance>(out _))
+                {
+                    KarmaVisualManager.ShowKarmaVisual(TargetPlayer);
+                    return;
+                }
+
                 TargetPlayer.AddModifier(Karma.MyRole);
+                karmaMeetingsLeft = Karmatic.EraseKarmaMeetingTimes.GetValue();
                 KarmaVisualManager.ShowKarmaVisual(TargetPlayer);
             }
+
+            // 与 Karma 修正体自己的 EraseKarma 同步倒计时；回合数到了就一并清掉名字装饰和特效。
+            [Local]
+            void OnMeetingPreEnd(MeetingPreEndEvent ev)
+            {
+                if (!HasTarget) return;
+                if (karmaMeetingsLeft > 0) karmaMeetingsLeft--;
+                if (karmaMeetingsLeft <= 0) ClearKarmaTarget();
+            }
+
             [Local]
             void OnDecorateName(PlayerDecorateNameEvent ev)
             {
-                if (!HasTarget || TargetPlayer == null) return;
+                if (!HasTarget) return;
+
+                // 目标断线/死亡/业力已消失时，停止染色或加 K，并释放技能。
+                if (TargetPlayer == null || TargetPlayer.VanillaPlayer == null || TargetPlayer.IsDead)
+                {
+                    ClearKarmaTarget();
+                    return;
+                }
 
                 if (ev.Player == TargetPlayer)
                 {
